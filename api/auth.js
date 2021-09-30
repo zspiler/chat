@@ -1,14 +1,25 @@
 const express = require("express");
+const { validationResult, body } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const jwt_decode = require("jwt-decode");
-
-const { validationResult, body } = require("express-validator");
+const multer = require("multer");
 
 const router = express.Router();
 
 const User = require("../models/User");
 const auth = require("../middleware/auth");
+
+const upload = multer({
+	storage: multer.diskStorage({
+		destination: function (_, _, cb) {
+			cb(null, `${__dirname}/../public/images`);
+		},
+		filename: function (_, file, cb) {
+			cb(null, file.fieldname + "-" + Date.now());
+		},
+	}),
+});
 
 // POST api/auth/signup
 // Create new user and log them in
@@ -17,10 +28,11 @@ router.post(
 	"/signup",
 	body("username").isLength({ min: 5 }),
 	body("password").isLength({ min: 6 }),
+	upload.single("picture"),
 	async (req, res) => {
 		const { username, password } = req.body;
 
-		const validationErrors = validationResult(req);
+		const validationErrors = validationResult(req.body);
 		if (!validationErrors.isEmpty()) {
 			return res.status(400).json({ errors: validationErrors.array() });
 		}
@@ -35,11 +47,22 @@ router.post(
 			username,
 			password: await bcrypt.hash(password, await bcrypt.genSalt(10)),
 		});
+		if (req.file) {
+			user.profilePicture = req.file.filename;
+		}
+
 		await user.save();
 
-		res.json({ message: "Successfully registered user" });
-
-		// TODO: login!
+		// Log user in
+		const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+			expiresIn: 86400,
+		});
+		res.cookie("chat_token", token, {
+			maxAge: 86400 * 1000,
+			httpOnly: true,
+			sameSite: process.env.NODE_ENV === "production",
+		});
+		res.json({ message: "Successfully registered user", token, username });
 	}
 );
 
@@ -73,7 +96,7 @@ router.post("/login", async (req, res) => {
 });
 
 // POST api/auth/user
-// Returns user info and refreshes cookie + token, or returns Unauthorized
+// Return user info and refresh cookie + token
 
 router.post("/token", auth, async (req, res) => {
 	const username = jwt_decode(req.cookies.chat_token).username;
@@ -92,7 +115,7 @@ router.post("/token", auth, async (req, res) => {
 // POST api/auth/logout
 // Log user out
 
-router.post("/logout", auth, async (_, res) => {
+router.post("/logout" /*,auth */, async (_, res) => {
 	res.clearCookie("chat_token");
 	return res.json({ message: "Successfully logged out" });
 });

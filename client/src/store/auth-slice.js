@@ -1,11 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
 import axios from "axios";
-import jwtDecode from "jwt-decode";
-import Cookies from "js-cookie";
-// import cookies from "js-cookie";
-
-import cook_easy from "react-easy-cookie";
 
 export const logoutUser = createAsyncThunk("user/logoutUser", async () => {
 	try {
@@ -46,8 +40,36 @@ export const loginUser = createAsyncThunk(
 	}
 );
 
-// TODO: setTimeout to log user (clear cookie) out when cookie invalid
-// TODO:
+export const signupUser = createAsyncThunk(
+	"user/signupUser",
+	async (formData) => {
+		try {
+			const res = await axios.post(
+				"/api/auth/signup",
+				formData,
+				{
+					withCredentials: true,
+				},
+				{
+					headers: {
+						// "Content-Type": "multipart/form-data",
+						"Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
+					},
+				}
+			);
+			return res.data;
+		} catch (err) {
+			if (err.response.data.message) {
+				throw new Error(err.response.data.message);
+			} else {
+				console.log("error:::::");
+				console.log(err);
+
+				throw new Error("Server error");
+			}
+		}
+	}
+);
 
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	try {
@@ -99,10 +121,23 @@ const authSlice = createSlice({
 			state.error = action.error.message;
 			state.loading = false;
 		},
-
-		[logoutUser.fulfilled]: (state, action) => {
+		[logoutUser.fulfilled]: (state, _) => {
 			state.token = "";
 			state.username = "";
+		},
+
+		[signupUser.pending]: (state) => {
+			state.error = null;
+			state.loading = true;
+		},
+		[signupUser.fulfilled]: (state, action) => {
+			state.username = action.payload.username;
+			state.token = action.payload.token;
+			state.loading = false;
+		},
+		[signupUser.rejected]: (state, action) => {
+			state.error = action.error.message;
+			state.loading = false;
 		},
 
 		[getUser.fulfilled]: (state, action) => {

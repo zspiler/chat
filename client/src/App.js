@@ -11,16 +11,18 @@ import NavigationBar from "./layout/NavigationBar";
 import { getUser } from "./store/auth-slice";
 
 function App() {
+	console.log("App");
+
 	const dispatch = useDispatch();
 	useEffect(() => {
-		dispatch(getUser())
-			.unwrap()
-			.then(() => {
-				console.log("App.js: Success");
-			})
-			.catch(() => {
-				console.log("App.js: Failed to get user");
-			});
+		dispatch(getUser());
+		// .unwrap()
+		// .then(() => {
+		// 	// console.log("");
+		// })
+		// .catch(() => {
+		// 	// console.log("App.js: Failed to get user");
+		// });
 	}, [dispatch]);
 
 	return (

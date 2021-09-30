@@ -4,14 +4,6 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-// app.use(cookieParser());
-// app.use(
-//   jwt({
-//     secret: 'secret123',
-//     getToken: req => req.cookies.token
-//   })
-// );
-
 require("dotenv").config();
 
 // Connect to MongoDB
@@ -38,6 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", require("./api/auth"));
+app.use("/api/users", require("./api/users"));
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Running on port ${port}`));

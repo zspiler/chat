@@ -10,6 +10,11 @@ const UserSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	profilePicture: {
+		type: String,
+		required: true,
+		default: "default.png",
+	},
 	friends: [
 		{
 			type: Schema.Types.ObjectId,
