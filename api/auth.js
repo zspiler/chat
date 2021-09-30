@@ -115,12 +115,12 @@ router.post("/token", auth, async (req, res) => {
 // POST api/auth/logout
 // Log user out
 
-router.post("/logout" /*,auth */, async (_, res) => {
+router.post("/logout", auth, (_, res) => {
 	res.clearCookie("chat_token");
 	return res.json({ message: "Successfully logged out" });
 });
 
-router.post("/protected", auth, async (req, res) => {
+router.post("/protected", auth, (req, res) => {
 	console.log("protected access");
 	res.send("ok");
 });

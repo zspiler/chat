@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import NavigationBar from "./layout/NavigationBar";
+import Dev from "./pages/Dev";
 
 import { getUser } from "./store/auth-slice";
 
@@ -40,6 +41,9 @@ function App() {
 				</Route>
 				<Route path="/signup" exact>
 					<Signup />
+				</Route>
+				<Route path="/dev" exact>
+					<Dev />
 				</Route>
 				<Route path="*">
 					<NotFound />
