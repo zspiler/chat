@@ -37,7 +37,9 @@ function NavigationBar() {
 
 			{auth.token && <a>Logged in as: {auth.username}</a>}
 			{auth.token ? (
-				<a onClick={logOut}>Log Out</a>
+				<a className="text-gray-1000" onClick={logOut}>
+					Log Out
+				</a>
 			) : (
 				<React.Fragment>
 					<Link to="/login">Login</Link>
