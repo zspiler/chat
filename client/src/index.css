@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* /* 
 body {
 	margin: 0;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
@@ -14,13 +14,39 @@ body {
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
 		monospace;
-}
+} */
 
-div {
+/* div {
 	left: 50%;
 	text-align: center;
+}  */
+
+.active-tab {
+	@apply text-white;
 }
 
-p.error {
-	color: red;
+.loader {
+	border-top-color: #ffffff;
+	border-bottom-color: #ffffff;
+
+	-webkit-animation: spinner 1s ease-out infinite;
+	animation: spinner 1s ease-out infinite;
+}
+
+@-webkit-keyframes spinner {
+	0% {
+		-webkit-transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+
+@keyframes spinner {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }

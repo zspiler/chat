@@ -32,5 +32,7 @@ app.use(cookieParser());
 app.use("/api/auth", require("./api/auth"));
 app.use("/api/users", require("./api/users"));
 
+app.use(express.static(__dirname + "/public"));
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Running on port ${port}`));

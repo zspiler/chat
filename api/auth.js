@@ -62,7 +62,12 @@ router.post(
 			httpOnly: true,
 			sameSite: process.env.NODE_ENV === "production",
 		});
-		res.json({ message: "Successfully registered user", token, username });
+		res.json({
+			message: "Successfully registered user",
+			token,
+			username,
+			profilePicture: user.profilePicture,
+		});
 	}
 );
 
@@ -88,7 +93,12 @@ router.post("/login", async (req, res) => {
 				httpOnly: true,
 				sameSite: process.env.NODE_ENV === "production",
 			});
-			res.json({ message: "Successfully logged in", token, username });
+			res.json({
+				message: "Successfully logged in",
+				token,
+				username,
+				profilePicture: user.profilePicture,
+			});
 		} else {
 			return res.status(401).json({ message: "Wrong password" });
 		}
@@ -109,7 +119,15 @@ router.post("/token", auth, async (req, res) => {
 		httpOnly: true,
 		sameSite: process.env.NODE_ENV === "production",
 	});
-	res.json({ message: "Refreshed token", token, username });
+
+	const user = await User.findOne({ username });
+
+	res.json({
+		message: "Refreshed token",
+		token,
+		username,
+		profilePicture: user.profilePicture,
+	});
 });
 
 // POST api/auth/logout

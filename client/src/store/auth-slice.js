@@ -52,7 +52,6 @@ export const signupUser = createAsyncThunk(
 				},
 				{
 					headers: {
-						// "Content-Type": "multipart/form-data",
 						"Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
 					},
 				}
@@ -93,6 +92,7 @@ const authSlice = createSlice({
 		error: null,
 		token: "",
 		username: "",
+		profilePicture: "",
 	},
 	reducers: {
 		// setLoading(state, action) {
@@ -115,6 +115,7 @@ const authSlice = createSlice({
 		[loginUser.fulfilled]: (state, action) => {
 			state.username = action.payload.username;
 			state.token = action.payload.token;
+			state.profilePicture = action.payload.profilePicture;
 			state.loading = false;
 		},
 		[loginUser.rejected]: (state, action) => {
@@ -124,6 +125,7 @@ const authSlice = createSlice({
 		[logoutUser.fulfilled]: (state, _) => {
 			state.token = "";
 			state.username = "";
+			state.profilePicture = "";
 		},
 
 		[signupUser.pending]: (state) => {
@@ -133,6 +135,7 @@ const authSlice = createSlice({
 		[signupUser.fulfilled]: (state, action) => {
 			state.username = action.payload.username;
 			state.token = action.payload.token;
+			state.profilePicture = action.payload.profilePicture;
 			state.loading = false;
 		},
 		[signupUser.rejected]: (state, action) => {
@@ -143,6 +146,7 @@ const authSlice = createSlice({
 		[getUser.fulfilled]: (state, action) => {
 			state.token = action.payload.token;
 			state.username = action.payload.username;
+			state.profilePicture = action.payload.profilePicture;
 		},
 	},
 });

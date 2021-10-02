@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
+import Welcome from "./pages/Welcome";
 import NotFound from "./pages/NotFound";
 import NavigationBar from "./layout/NavigationBar";
 import Dev from "./pages/Dev";
@@ -12,29 +12,21 @@ import Dev from "./pages/Dev";
 import { getUser } from "./store/auth-slice";
 
 function App() {
-	console.log("App");
-
 	const dispatch = useDispatch();
 	useEffect(() => {
 		dispatch(getUser());
-		// .unwrap()
-		// .then(() => {
-		// 	// console.log("");
-		// })
-		// .catch(() => {
-		// 	// console.log("App.js: Failed to get user");
-		// });
 	}, [dispatch]);
 
 	return (
+		// <div className=" from-purple-400 via-indigo-400 to-pink-200 bg-gradient-to-r">
 		<React.Fragment>
 			<NavigationBar />
 			<Switch>
 				<Route path="/" exact>
-					<Redirect to="/home" />
+					<Redirect to="/welcome" />
 				</Route>
-				<Route path="/home" exact>
-					<Home />
+				<Route path="/welcome" exact>
+					<Welcome />
 				</Route>
 				<Route path="/login" exact>
 					<Login />
@@ -50,6 +42,7 @@ function App() {
 				</Route>
 			</Switch>
 		</React.Fragment>
+		// </div>
 	);
 }
 

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import axios from "axios";
 
 import { loginUser } from "../store/auth-slice";
 
@@ -17,28 +16,16 @@ function Login() {
 		password: "",
 	});
 
-	// TODO: v Login se state reseta na initial, v 'friends' pa ne?
-
 	function onInputChange(event) {
 		setFormData((prevData) => {
 			return { ...prevData, [event.target.name]: event.target.value };
 		});
 	}
 
-	async function custom() {
-		try {
-			const res = await axios.post("/api/auth/protected", {
-				withCredentials: true,
-			});
-			console.log(res);
-		} catch (err) {
-			console.log(err);
-		}
-	}
-
 	async function onSubmit(event) {
 		event.preventDefault();
 		if (!(formData.username.length > 0 && formData.password.length > 0)) {
+			// TODO: error
 			return;
 		}
 
@@ -53,42 +40,69 @@ function Login() {
 	}
 
 	return (
-		<div>
-			<h1>Log in</h1>
-			<form onSubmit={onSubmit}>
-				<label>Username</label> <br />
-				<input
-					name="username"
-					type="text"
-					onChange={onInputChange}
-				/>{" "}
-				<br />
-				<label>Password</label> <br />
-				<input
-					name="password"
-					type="password"
-					onChange={onInputChange}
-				/>
-				<br />
-				<button
-					disabled={
-						!(
-							formData.username.length > 0 &&
-							formData.password.length > 0
-						)
-					}
+		<React.Fragment>
+			<p className="text-5xl text-gray-600">Log In</p>
+
+			<div className="flex items-center justify-center h-screen">
+				<form
+					className="w-full max-w-sm md:max-w-xl"
+					onSubmit={onSubmit}
 				>
-					Log In
-				</button>
-				<br />
-				<br />
-				<br />
-				<br />
-			</form>
-			<button onClick={custom}>Custom</button>
-			{loading && <p>Loading!</p>}
-			{error && <h4>ERROR: {error} </h4>}
-		</div>
+					<div className="mb-5">
+						<label
+							className="block text-gray-500 mb-2"
+							htmlFor="username"
+						>
+							Username
+						</label>
+						<input
+							className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+							id="inline-full-name"
+							type="text"
+							name="username"
+							onChange={onInputChange}
+						/>
+					</div>
+					<div className="mb-5">
+						<label
+							className="block text-gray-500 mb-2"
+							htmlFor="password"
+						>
+							Password
+						</label>
+						<input
+							className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+							id="inline-password"
+							type="password"
+							name="password"
+							onChange={onInputChange}
+						/>
+					</div>
+
+					<div className="flex items-center justify-center">
+						<button
+							className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white py-2 px-4 rounded"
+							disabled={
+								!(
+									formData.username.length > 0 &&
+									formData.password.length > 0
+								) || loading
+							}
+							type="submit"
+						>
+							<div className=" flex justify-center items-center">
+								{loading ? (
+									<div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
+								) : (
+									<div>Log In</div>
+								)}
+							</div>
+						</button>
+					</div>
+				</form>
+				{/* {error && <p>ERROR: {error} </p>} */}
+			</div>
+		</React.Fragment>
 	);
 }
 
