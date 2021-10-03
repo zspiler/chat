@@ -19,7 +19,7 @@ function App() {
 
 	return (
 		// <div className=" from-purple-400 via-indigo-400 to-pink-200 bg-gradient-to-r">
-		<React.Fragment>
+		<div className="flex flex-col h-screen">
 			<NavigationBar />
 			<Switch>
 				<Route path="/" exact>
@@ -41,7 +41,7 @@ function App() {
 					<NotFound />
 				</Route>
 			</Switch>
-		</React.Fragment>
+		</div>
 		// </div>
 	);
 }

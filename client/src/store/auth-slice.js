@@ -60,10 +60,9 @@ export const signupUser = createAsyncThunk(
 		} catch (err) {
 			if (err.response.data.message) {
 				throw new Error(err.response.data.message);
+			} else if (err.message) {
+				throw new Error(err.message);
 			} else {
-				console.log("error:::::");
-				console.log(err);
-
 				throw new Error("Server error");
 			}
 		}

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { signupUser } from "../store/auth-slice";
 
+import Error from "../layout/Error";
+
 function Signup() {
 	const error = useSelector((state) => state.auth.error);
 	const loading = useSelector((state) => state.auth.loading);
@@ -49,12 +51,34 @@ function Signup() {
 				.then(() => {
 					history.replace("/");
 				})
-				.catch((err) => {
-					console.log("Error signing up");
-					console.log(err);
-				});
+				.catch((_) => {});
 		}
 	};
+
+	function getFileExtension(filename) {
+		const basename = filename.split(/[\\/]/).pop();
+		const dotPos = basename.lastIndexOf(".");
+		if (dotPos < 1) {
+			return "";
+		}
+		return basename.slice(dotPos + 1);
+	}
+
+	function validateFile() {
+		return true;
+		if (
+			profilePicture &&
+			(!["jpeg", "jpg", "png"].includes(
+				getFileExtension(profilePicture.name)
+			) ||
+				profilePicture.size / 1024 / 1024 > 10)
+		) {
+			setProfilePicture(null);
+			return false;
+		}
+
+		return true;
+	}
 
 	function validateForm(data) {
 		setValidFields({
@@ -62,7 +86,12 @@ function Signup() {
 			password: data.password.length >= 6,
 			passwordConfirm: data.password === data.passwordConfirm,
 		});
-		const valid = Object.values(validFields).every((v) => v === true);
+		const valid =
+			validFields.username &&
+			validFields.password &&
+			validFields.passwordConfirm &&
+			validateFile();
+
 		setFormValid(valid);
 		return valid;
 	}
@@ -88,13 +117,14 @@ function Signup() {
 
 	return (
 		<React.Fragment>
-			<p className="text-5xl text-gray-600">Sign up</p>
-
-			<div className="flex items-center justify-center h-screen">
+			<div className="flex items-center justify-center h-screen p-16">
 				<form
-					className="w-full max-w-sm md:max-w-xl"
+					className="w-full max-w-sm md:max-w-l"
 					onSubmit={onSubmit}
 				>
+					<h2 className="text-4xl text-center text-gray-700 mb-6">
+						Sing Up
+					</h2>
 					<div className="mb-5">
 						<label
 							className="block text-gray-500 mb-2"
@@ -111,10 +141,11 @@ function Signup() {
 							onChange={onInputChange}
 						/>
 					</div>
+
 					{editedFields.username && !validFields.username && (
-						<p className="error">
+						<span className="flex items-center font-sm tracking-wide text-red-500 text-xs ml-1 mt-0 mb-3">
 							Username should be at least 5 characters long
-						</p>
+						</span>
 					)}
 					<div className="mb-5">
 						<label
@@ -133,9 +164,9 @@ function Signup() {
 						/>
 					</div>
 					{editedFields.password && !validFields.password && (
-						<p className="error">
+						<span className="flex items-center font-sm tracking-wide text-red-500 text-xs ml-1 mt-0 mb-3">
 							Password should be at least 6 characters long
-						</p>
+						</span>
 					)}
 					<div className="mb-5">
 						<label
@@ -155,11 +186,13 @@ function Signup() {
 					</div>
 					{editedFields.passwordConfirm &&
 						!validFields.passwordConfirm && (
-							<p className="error">Passwords do not match</p>
+							<span className="flex items-center font-sm tracking-wide text-red-500 text-xs ml-1 mt-0 mb-3">
+								Passwords do not match
+							</span>
 						)}
 
 					<div className="flex items-center">
-						<div className="w-2/3">
+						<div className="w-3/4">
 							<label className="block text-gray-500 mb-2">
 								Profile picture
 							</label>
@@ -195,6 +228,7 @@ function Signup() {
 														e.target.files[0]
 													)
 												}
+												// accept=".jpg, .png, .jpeg"
 											/>
 										</label>
 										<p className="pl-1">or drag and drop</p>
@@ -206,9 +240,9 @@ function Signup() {
 							</div>
 						</div>
 
-						<div className="flex justify-center m-6 w-1/3">
+						<div className="flex justify-center m-6 w-1/4">
 							<img
-								className="rounded-full border border-gray-100 shadow-sm h-20 w-20"
+								className="rounded-full border border-gray-100 shadow-sm h-14 w-14"
 								src={
 									profilePicture
 										? URL.createObjectURL(profilePicture)
@@ -217,6 +251,12 @@ function Signup() {
 								alt="preview"
 							/>
 						</div>
+
+						{profilePicture && !validateFile() && (
+							<span className="flex items-center font-sm tracking-wide text-red-500 text-xs ml-1 mt-0 mb-3">
+								File bad
+							</span>
+						)}
 					</div>
 
 					<div className="flex items-center justify-center mt-5">
@@ -235,8 +275,8 @@ function Signup() {
 						</button>
 					</div>
 				</form>
-				{/* {error && <p>ERROR: {error} </p>} */}
 			</div>
+			{error && <Error error={error} />}
 		</React.Fragment>
 	);
 }

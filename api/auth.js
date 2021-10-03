@@ -19,7 +19,24 @@ const upload = multer({
 			cb(null, file.fieldname + "-" + Date.now());
 		},
 	}),
-});
+	limits: {
+		fileSize: 10000000,
+	},
+	fileFilter: (req, file, cb) => {
+		if (
+			file.mimetype == "image/png" ||
+			file.mimetype == "image/jpg" ||
+			file.mimetype == "image/jpeg"
+		) {
+			cb(null, true);
+		} else {
+			cb(null, false);
+			req.fileValidationError =
+				"Submitted file must be in PNG or JPG format";
+			return cb(new Error("Submitted file must be in PNG or JPG format"));
+		}
+	},
+}).single("picture");
 
 // POST api/auth/signup
 // Create new user and log them in
@@ -28,45 +45,52 @@ router.post(
 	"/signup",
 	body("username").isLength({ min: 5 }),
 	body("password").isLength({ min: 6 }),
-	upload.single("picture"),
 	async (req, res) => {
-		const { username, password } = req.body;
+		upload(req, res, async (err) => {
+			if (err) {
+				return res.status(422).json({ message: err.message });
+			}
 
-		const validationErrors = validationResult(req.body);
-		if (!validationErrors.isEmpty()) {
-			return res.status(400).json({ errors: validationErrors.array() });
-		}
+			const { username, password } = req.body;
 
-		// Check if username taken
-		const exists = await User.exists({ username });
-		if (exists) {
-			return res.status(409).json({ message: "Username taken" });
-		}
+			const validationErrors = validationResult(req.body);
+			if (!validationErrors.isEmpty()) {
+				return res
+					.status(400)
+					.json({ errors: validationErrors.array() });
+			}
 
-		const user = new User({
-			username,
-			password: await bcrypt.hash(password, await bcrypt.genSalt(10)),
-		});
-		if (req.file) {
-			user.profilePicture = req.file.filename;
-		}
+			// Check if username taken
+			const exists = await User.exists({ username });
+			if (exists) {
+				return res.status(409).json({ message: "Username taken" });
+			}
 
-		await user.save();
+			const user = new User({
+				username,
+				password: await bcrypt.hash(password, await bcrypt.genSalt(10)),
+			});
+			if (req.file) {
+				user.profilePicture = req.file.filename;
+			}
 
-		// Log user in
-		const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-			expiresIn: 86400,
-		});
-		res.cookie("chat_token", token, {
-			maxAge: 86400 * 1000,
-			httpOnly: true,
-			sameSite: process.env.NODE_ENV === "production",
-		});
-		res.json({
-			message: "Successfully registered user",
-			token,
-			username,
-			profilePicture: user.profilePicture,
+			await user.save();
+
+			// Log user in
+			const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+				expiresIn: 86400,
+			});
+			res.cookie("chat_token", token, {
+				maxAge: 86400 * 1000,
+				httpOnly: true,
+				sameSite: process.env.NODE_ENV === "production",
+			});
+			res.json({
+				message: "Successfully registered user",
+				token,
+				username,
+				profilePicture: user.profilePicture,
+			});
 		});
 	}
 );
@@ -136,11 +160,6 @@ router.post("/token", auth, async (req, res) => {
 router.post("/logout", auth, (_, res) => {
 	res.clearCookie("chat_token");
 	return res.json({ message: "Successfully logged out" });
-});
-
-router.post("/protected", auth, (req, res) => {
-	console.log("protected access");
-	res.send("ok");
 });
 
 module.exports = router;

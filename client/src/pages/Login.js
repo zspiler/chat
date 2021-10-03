@@ -4,6 +4,8 @@ import { useHistory } from "react-router-dom";
 
 import { loginUser } from "../store/auth-slice";
 
+import Error from "../layout/Error";
+
 function Login() {
 	const error = useSelector((state) => state.auth.error);
 	const loading = useSelector((state) => state.auth.loading);
@@ -25,7 +27,6 @@ function Login() {
 	async function onSubmit(event) {
 		event.preventDefault();
 		if (!(formData.username.length > 0 && formData.password.length > 0)) {
-			// TODO: error
 			return;
 		}
 
@@ -41,13 +42,15 @@ function Login() {
 
 	return (
 		<React.Fragment>
-			<p className="text-5xl text-gray-600">Log In</p>
-
 			<div className="flex items-center justify-center h-screen">
 				<form
 					className="w-full max-w-sm md:max-w-xl"
 					onSubmit={onSubmit}
 				>
+					<h1 className="text-4xl text-center text-gray-700">
+						Log In
+					</h1>
+
 					<div className="mb-5">
 						<label
 							className="block text-gray-500 mb-2"
@@ -100,8 +103,9 @@ function Login() {
 						</button>
 					</div>
 				</form>
-				{/* {error && <p>ERROR: {error} </p>} */}
 			</div>
+
+			{error && <Error error={error} />}
 		</React.Fragment>
 	);
 }
