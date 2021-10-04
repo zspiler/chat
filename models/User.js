@@ -15,12 +15,12 @@ const UserSchema = new Schema({
 		required: true,
 		default: "default.png",
 	},
-	// friends: [
-	// 	{
-	// 		type: Schema.Types.ObjectId,
-	// 		ref: "user",
-	// 	},
-	// ],
+	conversations: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "conversation",
+		},
+	],
 	blocked: [
 		{
 			type: Schema.Types.ObjectId,

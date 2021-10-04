@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import { loginUser } from "../store/auth-slice";
+import { loginUser } from "../../store/auth-slice";
 
 import Error from "../layout/Error";
 
 function Login() {
+	const auth = useSelector((state) => state.auth);
 	const error = useSelector((state) => state.auth.error);
 	const loading = useSelector((state) => state.auth.loading);
 
 	const history = useHistory();
 	const dispatch = useDispatch();
+
+	if (auth.token) {
+		history.replace("/");
+	}
 
 	const [formData, setFormData] = useState({
 		username: "",

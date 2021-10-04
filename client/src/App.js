@@ -2,12 +2,15 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import Signup from "./pages/Signup";
-import Login from "./pages/Login";
-import Welcome from "./pages/Welcome";
-import NotFound from "./pages/NotFound";
-import NavigationBar from "./layout/NavigationBar";
-import Dev from "./pages/Dev";
+import Signup from "./components/pages/Signup";
+import Login from "./components/pages/Login";
+import Welcome from "./components/pages/Welcome";
+import NotFound from "./components/pages/NotFound";
+import NavigationBar from "./components/layout/NavigationBar";
+import DirectChat from "./components/pages/DirectChat";
+import GroupChat from "./components/pages/GroupChat";
+import PrivateRoute from "./components/PrivateRoute";
+import Dev from "./components/pages/Dev";
 
 import { getUser } from "./store/auth-slice";
 
@@ -18,7 +21,6 @@ function App() {
 	}, [dispatch]);
 
 	return (
-		// <div className=" from-purple-400 via-indigo-400 to-pink-200 bg-gradient-to-r">
 		<div className="flex flex-col h-screen">
 			<NavigationBar />
 			<Switch>
@@ -37,12 +39,17 @@ function App() {
 				<Route path="/dev" exact>
 					<Dev />
 				</Route>
+				<PrivateRoute path="/direct" exact={true}>
+					<DirectChat />
+				</PrivateRoute>
+				<PrivateRoute path="/group" exact={true}>
+					<GroupChat />
+				</PrivateRoute>
 				<Route path="*">
 					<NotFound />
 				</Route>
 			</Switch>
 		</div>
-		// </div>
 	);
 }
 

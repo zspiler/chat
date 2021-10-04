@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { NavLink, Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "../store/auth-slice";
+import { logoutUser } from "../../store/auth-slice";
 
 function NavigationBar() {
 	const location = useLocation();

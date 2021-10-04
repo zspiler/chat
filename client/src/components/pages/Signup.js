@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
-import { signupUser } from "../store/auth-slice";
+import { signupUser } from "../../store/auth-slice";
 
 import Error from "../layout/Error";
 
