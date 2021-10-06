@@ -4,6 +4,8 @@ import { w3cwebsocket } from "websocket";
 function DirectChat() {
 	const [client, setClient] = useState(null);
 
+	const [messages, setMessages] = useState([]);
+
 	const [textInput, setTextInput] = useState("");
 
 	useEffect(() => {
@@ -16,8 +18,18 @@ function DirectChat() {
 				console.log("Client Connected");
 			};
 			wsClient.onmessage = (message) => {
-				console.log("received: ");
+				console.log("received ");
 				console.log(message);
+				try {
+					// const { author, text, _id } = JSON.parse(message.data);
+					const msg = JSON.parse(message.data);
+					setMessages((previousState) => [...previousState, msg]);
+					// console.log(messages);
+				} catch (error) {
+					// TODO:
+					console.log("Error!!!");
+					console.log(error);
+				}
 			};
 			return wsClient;
 		});
@@ -36,6 +48,8 @@ function DirectChat() {
 		setTextInput(event.target.value);
 	}
 
+	// TODO: message must be  > 0, <= 1000
+
 	return (
 		<div>
 			{/* <form onSubmit={}> */}
@@ -53,6 +67,12 @@ function DirectChat() {
 				send
 			</button>
 			{/* </form> */}
+
+			{messages.map((message) => (
+				<div>
+					Author: {message.author} Text: {message.text}
+				</div>
+			))}
 		</div>
 	);
 }
