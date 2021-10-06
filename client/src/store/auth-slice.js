@@ -69,6 +69,7 @@ export const signupUser = createAsyncThunk(
 	}
 );
 
+// Validate cookie
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	try {
 		const res = await axios.post("/api/auth/token", {
@@ -87,7 +88,7 @@ export const getUser = createAsyncThunk("user/getUser", async () => {
 const authSlice = createSlice({
 	name: "auth",
 	initialState: {
-		loading: false,
+		loading: true,
 		error: null,
 		token: "",
 		username: "",
@@ -142,10 +143,18 @@ const authSlice = createSlice({
 			state.loading = false;
 		},
 
+		[getUser.pending]: (state) => {
+			state.loading = true;
+		},
+		[getUser.rejected]: (state) => {
+			state.loading = false;
+		},
+
 		[getUser.fulfilled]: (state, action) => {
 			state.token = action.payload.token;
 			state.username = action.payload.username;
 			state.profilePicture = action.payload.profilePicture;
+			state.loading = false;
 		},
 	},
 });

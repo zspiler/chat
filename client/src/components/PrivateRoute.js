@@ -5,7 +5,11 @@ import { Redirect } from "react-router-dom";
 function PrivateRoute(props) {
 	const auth = useSelector((state) => state.auth);
 
-	return auth.token ? props.children : <Redirect to={{ pathname: "/" }} />;
+	return auth.loading ? null : auth.token ? (
+		props.children
+	) : (
+		<Redirect to={{ pathname: "/" }} />
+	);
 }
 
 export default PrivateRoute;

@@ -2,11 +2,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
-// Connect to MongoDB
+// connect to mongo
 (async function () {
 	try {
 		await mongoose.connect(process.env.MONGO_URL);
@@ -29,9 +28,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+// enable WS
+require("express-ws")(app);
+
 app.use("/api/auth", require("./api/auth"));
 app.use("/api/users", require("./api/users"));
 app.use("/api/conversations", require("./api/conversations"));
+app.use("/api/chat", require("./api/chat"));
 
 app.use(express.static(__dirname + "/public"));
 

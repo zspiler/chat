@@ -20,7 +20,8 @@
     "react-scripts": "4.0.3",
     "redux": "^4.1.1",
     "redux-cookie": "^0.5.9",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "websocket": "^1.0.34"
   },
   "scripts": {
     "start": "craco start",
