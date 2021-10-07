@@ -5,7 +5,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 
-// connect to mongo
+// connect to database
 (async function () {
 	try {
 		await mongoose.connect(process.env.MONGO_URL);

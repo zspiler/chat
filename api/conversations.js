@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { validationResult, body, query } = require("express-validator");
+const { validationResult, body } = require("express-validator");
 
 const router = express.Router();
 
@@ -69,56 +69,49 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 	res.json({ messages: "Successfuly created conversation", _id });
 });
 
-// PUT api/messages
-// Send message to conversation
-router.put(
-	"/",
-	auth,
-	body("conversationId").notEmpty(),
-	body("text").notEmpty(),
-	body("text").isLength({ max: 1000 }),
-	async (req, res) => {
-		const validationErrors = validationResult(req);
-		if (!validationErrors.isEmpty()) {
-			return res.status(400).json({ errors: validationErrors.array() });
-		}
+// GET api/conversations/:conversationId
+// Get data on users in conversation
 
-		// Check conversation exists
-		const exists = await Conversation.exists({
-			_id: req.body.conversationID,
-		});
-		if (!exists) {
-			return res
-				.status(404)
-				.json({ message: "Conversation does not exist" });
-		}
+router.get("/:conversationId", auth, async (req, res) => {
+	const { conversationId } = req.params;
 
-		const loggedInUser = await User.findOne({
-			username: req.username,
-		}).exec();
-
-		// Check conversation in user's conversations
-		if (
-			!loggedInUser.conversations.includes(
-				new mongoose.Types.ObjectId(req.body.conversationId)
-			)
-		) {
-			return res.status(409).json({ message: "Unauthorized" });
-		}
-
-		await Conversation.findOneAndUpdate(
-			{ _id: req.body.conversationId },
-			{
-				$push: {
-					messages: {
-						author: loggedInUser._id,
-						text: req.body.text,
-					},
-				},
-			}
-		);
-		res.json({ messages: "Successfuly sent message" });
+	const validationErrors = validationResult(req);
+	if (!validationErrors.isEmpty()) {
+		return res.status(400).json({ errors: validationErrors.array() });
 	}
-);
+
+	// Check conversation exists
+	const exists = await Conversation.exists({
+		_id: mongoose.Types.ObjectId(conversationId),
+	});
+	if (!exists) {
+		return res.status(404).json({ message: "Conversation does not exist" });
+	}
+
+	// Check user is in conversation
+	const user = await User.findOne({
+		username: req.username,
+	}).exec();
+
+	if (!user.conversations.includes(mongoose.Types.ObjectId(conversationId))) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+
+	const conversation = await Conversation.findById(conversationId);
+
+	const users = [];
+	for (let i = 0; i < conversation.users.length; i++) {
+		users.push(await User.findById(conversation.users[i]._id));
+	}
+
+	res.json({
+		users: users.map((user) => {
+			return {
+				username: user.username,
+				profilePicture: user.profilePicture,
+			};
+		}),
+	});
+});
 
 module.exports = router;

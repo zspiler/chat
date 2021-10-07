@@ -19,9 +19,12 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 		return;
 	}
 
-	// Add user to conversation obj
+	// Add user to 'conversations'
 	if (conversationId in conversations) {
-		if (conversations[conversationId].find((el) => el.user === user._id)) {
+		const userExists = conversations[conversationId].find((el) => {
+			return String(el.user) === String(user._id);
+		});
+		if (!userExists) {
 			conversations[conversationId].push({ user: user._id, socket: ws });
 		}
 	} else {
@@ -29,9 +32,13 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 	}
 
 	// Fetch and send all messages
-	const convo = await Conversation.findOne({ _id: conversationId });
+	const convo = await Conversation.findById(conversationId);
+
 	for (let i = 0; i < convo.messages.length; i++) {
-		ws.send(JSON.stringify(convo.messages[i]));
+		const message = JSON.parse(JSON.stringify(convo.messages[i]));
+		message.author = await User.findById(message.author);
+
+		ws.send(JSON.stringify(message));
 	}
 
 	ws.on("message", async function (message) {
@@ -45,7 +52,7 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 			return false;
 		}
 
-		await Conversation.findOneAndUpdate(
+		const updatedConvo = await Conversation.findOneAndUpdate(
 			{ _id: conversationId },
 			{
 				$push: {
@@ -54,26 +61,29 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 						text: payload.text,
 					},
 				},
-			}
+			},
+			{ new: true }
 		);
+		const newMessage =
+			updatedConvo.messages[updatedConvo.messages.length - 1];
+		newMessage.author = user;
 
 		// Send message to all (both) participants in conversation
 		for (var i = 0; i < conversations[conversationId].length; i++) {
 			conversations[conversationId][i].socket.send(
-				JSON.stringify({
-					author: user._id,
-					text: payload.text,
-				})
+				JSON.stringify(newMessage)
 			);
 		}
 	});
 
 	ws.on("close", function () {
+		console.log("close");
 		// Remove user from conversation
 		const i = conversations[conversationId].findIndex(
 			(p) => p.user === user._id
 		);
 		conversations[conversationId].splice(i);
+		console.log(conversations);
 	});
 });
 
