@@ -37,7 +37,7 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 	ws.on("message", async function (message) {
 		const payload = JSON.parse(message);
 
-		// TODO: catch any parse errors? Prevent CSS
+		// TODO: catch any parse errors, check for <script> etc
 
 		// Validate message
 		if (payload.text.length < 1 || payload.text.length > 1000) {
@@ -78,7 +78,6 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 });
 
 // Verify token, check conversation permissions
-
 async function authorize(ws, req) {
 	// Validate token
 	const token = req.cookies.chat_token;
