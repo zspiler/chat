@@ -52,8 +52,7 @@ function DirectChat() {
 				console.log("Client Connected");
 			};
 			wsClient.onmessage = (message) => {
-				// console.log("client got message from chat.js");
-				console.log(JSON.parse(message.data));
+				// console.log(message);
 				try {
 					const msg = JSON.parse(message.data);
 					setMessages((previousState) => [...previousState, msg]);
@@ -63,6 +62,7 @@ function DirectChat() {
 					console.log(error);
 				}
 			};
+
 			return wsClient;
 		});
 	}, []);
@@ -92,6 +92,32 @@ function DirectChat() {
 		}
 	}
 
+	function renderMessages() {
+		var prevDate = null;
+		return messages.map((message) => {
+			if (prevDate !== message.date) {
+				prevDate = message.date;
+				return (
+					<div
+						className="flex mt-2 justify-center items-center"
+						key={message.date}
+					>
+						<span className="h-auto text-gray-300 rounded-br-none text-xs rounded-lg p-2">
+							{message.date}
+						</span>
+					</div>
+				);
+			}
+			return (
+				<MessageBubble
+					message={message}
+					fromLoggedIn={message.author.username === auth.username}
+					key={message._id}
+				/>
+			);
+		});
+	}
+
 	return (
 		participant && (
 			<div className="h-screen bg-gray-300 overflow-auto">
@@ -114,16 +140,7 @@ function DirectChat() {
 							className="overflow-auto px-1 py-1"
 							style={{ height: "19rem" }}
 						>
-							{messages.map((message) => (
-								<MessageBubble
-									message={message}
-									fromLoggedIn={
-										message.author.username ===
-										auth.username
-									}
-									key={message._id}
-								/>
-							))}
+							{renderMessages()}
 						</div>
 
 						<div className="flex justify-between items-center px-1 border-t border-gray-200">

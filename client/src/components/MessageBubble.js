@@ -1,19 +1,19 @@
 import React from "react";
 
 function MessageBubble(props) {
-	// console.log("PROPS");
-	// console.log(props);
-
 	if (props.fromLoggedIn) {
 		return (
-			<div className={`flex mt-2 justify-end items-end`}>
-				<span className="flex bg-purple-500 h-auto text-gray-200 rounded-br-none text-xs rounded-lg p-2 items-end justify-end">
+			<div
+				className="flex mt-2 justify-end items-end"
+				key={props.message._id}
+			>
+				<span className="flex bg-purple-600 h-auto text-gray-200 rounded-br-none text-xs rounded-lg p-2 items-end justify-end">
 					{props.message.text}
 					<span
 						className="text-gray-300 pl-1"
 						style={{ fontSize: "8px" }}
 					>
-						{JSON.stringify(props.message.time)}
+						{props.message.time}
 					</span>
 				</span>
 				<img
@@ -26,7 +26,7 @@ function MessageBubble(props) {
 	}
 
 	return (
-		<div className="flex mt-2 items-center ">
+		<div className="flex mt-2 items-center" key={props.message._id}>
 			<img
 				src={`/images/${props.message.author.profilePicture}`}
 				className="rounded-full shadow-xl w-5 h-5 mr-2"
@@ -38,7 +38,7 @@ function MessageBubble(props) {
 					className="text-gray-500 pl-1"
 					style={{ fontSize: "8px" }}
 				>
-					{JSON.stringify(props.message.time)}
+					{props.message.time}
 				</span>
 			</span>
 		</div>

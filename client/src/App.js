@@ -1,6 +1,6 @@
 import { Switch, Route, Redirect } from "react-router-dom";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Signup from "./components/pages/Signup";
 import Login from "./components/pages/Login";
@@ -20,6 +20,8 @@ function App() {
 		dispatch(getUser());
 	}, [dispatch]);
 
+	const auth = useSelector((state) => state.auth);
+
 	return (
 		<div className="flex flex-col h-screen">
 			<NavigationBar />
@@ -30,11 +32,14 @@ function App() {
 				<Route path="/welcome" exact>
 					<Welcome />
 				</Route>
+
 				<Route path="/login" exact>
-					<Login />
+					{!auth.token && <Login />}
+					{auth.token && <Redirect to="/welcome" />}
 				</Route>
 				<Route path="/signup" exact>
-					<Signup />
+					{!auth.token && <Signup />}
+					{auth.token && <Redirect to="/welcome" />}
 				</Route>
 				<Route path="/dev" exact>
 					<Dev />
