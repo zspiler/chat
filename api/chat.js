@@ -86,14 +86,25 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 						text: payload.text,
 					},
 				},
+				latestMessage: {
+					author: user._id,
+					text: payload.text,
+				},
 			},
-			{ new: true }
+			{ new: true, setDefaultsOnInsert: true }
 		).lean();
 
-		// add user obj, format date
 		const newMessage =
 			updatedConvo.messages[updatedConvo.messages.length - 1];
-		newMessage.author = user;
+
+		// Update conversation's latest message
+
+		// Process message for client
+
+		newMessage.author = {
+			username: user.username,
+			profilePicture: user.profilePicture,
+		};
 		const dateTime = newMessage.time;
 		newMessage.time = moment(dateTime).format("hh:mm A");
 		newMessage.date = moment(dateTime).format("MMM Do, YYYY");

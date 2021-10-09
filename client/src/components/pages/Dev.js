@@ -11,6 +11,21 @@ async function call() {
 			console.log(err);
 		}
 	})();
+
+	// try {
+	// 	const res = await axios.post(
+	// 		`/api/conversations`,
+	// 		{
+	// 			username: "azra123",
+	// 		},
+	// 		{
+	// 			withCredentials: true,
+	// 		}
+	// 	);
+	// 	console.log("nice");
+	// } catch (err) {
+	// 	console.log(err);
+	// }
 }
 
 function Dev() {

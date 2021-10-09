@@ -31,6 +31,30 @@ const ConversationSchema = new Schema({
 			},
 		},
 	],
+	latestMessage: {
+		type: {
+			author: {
+				type: Schema.Types.ObjectId,
+				ref: "user",
+				required: true,
+			},
+			text: {
+				type: String,
+				required: true,
+			},
+			time: {
+				type: Date,
+				default: Date.now,
+				required: true,
+			},
+			seen: {
+				type: Boolean,
+				default: false,
+				required: true,
+			},
+		},
+		required: false,
+	},
 });
 
 Conversation = mongoose.model("conversation", ConversationSchema);

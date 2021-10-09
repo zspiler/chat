@@ -27,7 +27,7 @@ function DirectChat() {
 			try {
 				setLoading(true);
 				const res = await axios.get(
-					`/api/conversations/615b4f11fd8bac08c7ff3605`,
+					`/api/conversations/6161d48eee76e50e2215e3b5`,
 					{
 						withCredentials: true,
 					}
@@ -51,7 +51,7 @@ function DirectChat() {
 		// initialize WebSocket client
 		setClient((_) => {
 			const wsClient = new w3cwebsocket(
-				"ws://localhost:5000/api/chat/direct/615b4f11fd8bac08c7ff3605"
+				"ws://localhost:5000/api/chat/direct/6161d48eee76e50e2215e3b5"
 			);
 			wsClient.onopen = () => {
 				console.log("Client Connected");
@@ -113,14 +113,25 @@ function DirectChat() {
 			if (prevDate !== message.date) {
 				prevDate = message.date;
 				return (
-					<div
-						className="flex mt-2 justify-center items-center"
-						key={message.date}
-					>
-						<span className="h-auto text-gray-300 rounded-br-none text-xs rounded-lg p-2">
-							{message.date}
-						</span>
-					</div>
+					<React.Fragment>
+						<div
+							className="flex mt-2 justify-center items-center"
+							key={message.date}
+						>
+							<span className="h-auto text-gray-300 rounded-br-none text-xs rounded-lg p-2">
+								{message.date}
+							</span>
+						</div>
+						<div ref={latestMessageRef} key={message._id}>
+							{scrollToLatestMessage()}
+							<MessageBubble
+								message={message}
+								fromLoggedIn={
+									message.author.username === auth.username
+								}
+							/>
+						</div>
+					</React.Fragment>
 				);
 			}
 			return (
