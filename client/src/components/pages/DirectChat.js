@@ -137,22 +137,63 @@ function DirectChat() {
 
 	return (
 		<React.Fragment>
-			<div className="h-screen bg-gray-300 overflow-auto">
-				<div className="flex justify-center items-center h-screen">
-					{loading && (
-						<div className="loader bg-black ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
-					)}
+			<div className="bg bg-gray-200 h-screen">
+				<div className="flex justify-center h-screen mt-24">
+					{/* CONVERSATIONS */}
+					<div className="w-2/12 h-2/3 h-80 bg-white rounded-l shadow-2xl">
+						<nav className="w-full h-14 border-b border-gray-300 flex justify-between items-center">
+							<div className="flex justify-center items-center p-1">
+								<img
+									src={`/images/${auth.profilePicture}`}
+									className="rounded-full ml-2 w-12 h-12"
+									alt={auth.username}
+								/>
+								<span className="text-md text-gray-800 ml-2">
+									{auth.username}
+								</span>
+							</div>
+						</nav>
+						<div className="overflow-auto h-5/6">
+							{[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1].map(
+								(_) => (
+									<div className="flex flex-row justify-between">
+										<div className="flex flex-row p-2 justify-start">
+											<div className="float-left">
+												<img
+													src={`/images/default.png`}
+													className="rounded-full w-11 h-11 mr-2"
+													alt="joze"
+												/>
+											</div>
+											<div>
+												<div className="font-medium text-sm font">
+													Janez123
+												</div>
+												<div className="text-xs text-gray-700">
+													Text fake..
+												</div>
+											</div>
+										</div>
+
+										<div className="text-xs p-3 text-gray-300">
+											01:05AM
+										</div>
+									</div>
+								)
+							)}
+						</div>
+					</div>
+					{/* CHAT */}
 					{participant && (
 						<div
-							className="w-5/12 h-100 bg-white rounded shadow-2xl"
+							className="w-5/12 h-2/3 bg-white rounded-r shadow-2xl relative"
 							ref={scrollBoxRef}
 						>
-							<nav className="w-full h-14 border-b border-gray-200 rounded-tr rounded-tl flex justify-between items-center">
+							<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
 								<div className="flex justify-center items-center p-1">
-									<i className="mdi mdi-arrow-left font-normal text-gray-300 ml-1"></i>{" "}
 									<img
 										src={`/images/${participant.profilePicture}`}
-										className="rounded-full ml-2 w-10 h-10"
+										className="rounded-full ml-3 w-10 h-10"
 										alt={participant.username}
 									/>
 									<span className="text-sm font-medium text-gray-600 ml-2">
@@ -160,14 +201,11 @@ function DirectChat() {
 									</span>
 								</div>
 							</nav>
-							<div
-								className="overflow-auto px-1 py-1"
-								style={{ height: "19rem" }}
-							>
+							<div className="overflow-auto px-1 py-1 h-5/6">
 								{renderMessages()}
 							</div>
 
-							<div className="flex justify-between items-center px-1 border-t border-gray-200">
+							<div className="flex h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
 								<input
 									type="text"
 									className="h-8 w-11/12 mx-2 text-xs pl-5 pr-20 bg-gray-100 rounded-lg z-0 focus:shadow focus:outline-none"
