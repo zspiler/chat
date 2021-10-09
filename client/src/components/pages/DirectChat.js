@@ -15,6 +15,7 @@ function DirectChat() {
 
 	const [client, setClient] = useState(null);
 
+	const [conversations, setConversations] = useState([]);
 	const [messages, setMessages] = useState([]);
 	const [participant, setParticipant] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -22,6 +23,32 @@ function DirectChat() {
 	const [textInput, setTextInput] = useState("");
 
 	useEffect(() => {
+		// Fetch conversations
+		(async function () {
+			try {
+				const res = await axios.get(`/api/conversations`, {
+					withCredentials: true,
+				});
+				setConversations(res.data);
+
+				// res.data.forEach((conversation) => {
+				// 	console.log("convo: ");
+				// 	console.log(conversation);
+				// 	setConversations((previousState) => [
+				// 		...previousState,
+				// 		conversation,
+				// 	]);
+				// });
+
+				// console.log("convos: ");
+				// console.log(conversations);
+				// setLoading(false);
+			} catch (err) {
+				// TODO: error
+				console.log(err);
+			}
+		})();
+
 		// Fetch conversation
 		(async function () {
 			try {
@@ -36,6 +63,7 @@ function DirectChat() {
 					if (res.data.users[i].username !== auth.username) {
 						setParticipant((_) => res.data.users[i]);
 						// TODO: do this in API....
+
 						break;
 					}
 				}
@@ -113,7 +141,7 @@ function DirectChat() {
 			if (prevDate !== message.date) {
 				prevDate = message.date;
 				return (
-					<React.Fragment>
+					<React.Fragment key={message.date}>
 						<div
 							className="flex mt-2 justify-center items-center"
 							key={message.date}
@@ -165,7 +193,34 @@ function DirectChat() {
 							</div>
 						</nav>
 						<div className="overflow-auto h-5/6">
-							{[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1].map(
+							{conversations.map((convo) => (
+								<div
+									className="flex flex-row justify-between"
+									key={convo.id}
+								>
+									<div className="flex flex-row p-2 justify-start">
+										<div className="float-left">
+											<img
+												src={`/images/${convo.profilePicture}`}
+												className="rounded-full w-11 h-11 mr-2"
+												alt="joze"
+											/>
+										</div>
+										<div>
+											<div className="font-medium text-sm font">
+												{convo.username}
+											</div>
+											<div className="text-xs text-gray-700">
+												{convo.latestMessage.text}
+											</div>
+										</div>
+									</div>
+									<div className="text-xs p-3 text-gray-300">
+										{convo.latestMessage.time}
+									</div>
+								</div>
+							))}
+							{/* {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1].map(
 								(_) => (
 									<div className="flex flex-row justify-between">
 										<div className="flex flex-row p-2 justify-start">
@@ -191,7 +246,7 @@ function DirectChat() {
 										</div>
 									</div>
 								)
-							)}
+							)} */}
 						</div>
 					</div>
 					{/* CHAT */}

@@ -199,7 +199,7 @@ router.get("/:conversationId", auth, async (req, res) => {
 });
 
 // GET api/conversations
-// Get user's conversations (without messages)
+// Get user's conversations sorted by latest message (without messages)
 
 router.get("/", auth, async (req, res) => {
 	const user = await User.findOne({
@@ -211,7 +211,25 @@ router.get("/", auth, async (req, res) => {
 	for (let i = 0; i < user.conversations.length; i++) {
 		const convo = await Conversation.findById(user.conversations[i]).lean();
 		delete convo["messages"];
-		conversations.push(convo);
+
+		let participant = null;
+		for (let i = 0; i < convo.users.length; i++) {
+			if (req.id.toString() !== convo.users[i].toString()) {
+				participant = await User.findById(convo.users[i]);
+				break;
+			}
+		}
+
+		convo.latestMessage.time = moment(convo.latestMessage.time).format(
+			"hh:mm A"
+		);
+
+		conversations.push({
+			id: convo._id,
+			username: participant.username,
+			profilePicture: participant.profilePicture,
+			latestMessage: convo.latestMessage,
+		});
 	}
 	res.json(conversations);
 });

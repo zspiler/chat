@@ -77,9 +77,13 @@ router.post(
 			await user.save();
 
 			// Log user in
-			const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-				expiresIn: 86400,
-			});
+			const token = jwt.sign(
+				{ username, id: user._id },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: 86400,
+				}
+			);
 			res.cookie("chat_token", token, {
 				maxAge: 86400 * 1000,
 				httpOnly: true,
@@ -90,6 +94,7 @@ router.post(
 				token,
 				username,
 				profilePicture: user.profilePicture,
+				id: user._id,
 			});
 		});
 	}
@@ -109,9 +114,13 @@ router.post("/login", async (req, res) => {
 		const passwordValid = await bcrypt.compare(password, user.password);
 		if (passwordValid) {
 			// Create token
-			const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-				expiresIn: 86400,
-			});
+			const token = jwt.sign(
+				{ username, id: user._id },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: 86400,
+				}
+			);
 			res.cookie("chat_token", token, {
 				maxAge: 86400 * 1000,
 				httpOnly: true,
@@ -122,6 +131,7 @@ router.post("/login", async (req, res) => {
 				token,
 				username,
 				profilePicture: user.profilePicture,
+				id: user._id,
 			});
 		} else {
 			return res.status(401).json({ message: "Wrong password" });
@@ -134,8 +144,9 @@ router.post("/login", async (req, res) => {
 
 router.post("/token", auth, async (req, res) => {
 	const username = jwt_decode(req.cookies.chat_token).username;
+	const user = await User.findOne({ username });
 
-	const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+	const token = jwt.sign({ username, id: user._id }, process.env.JWT_SECRET, {
 		expiresIn: 86400,
 	});
 	res.cookie("chat_token", token, {
@@ -143,8 +154,6 @@ router.post("/token", auth, async (req, res) => {
 		httpOnly: true,
 		sameSite: process.env.NODE_ENV === "production",
 	});
-
-	const user = await User.findOne({ username });
 
 	res.json({
 		message: "Refreshed token",
