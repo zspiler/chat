@@ -65,7 +65,6 @@ function Signup() {
 	}
 
 	function validateFile() {
-		return true;
 		if (
 			profilePicture &&
 			(!["jpeg", "jpg", "png"].includes(

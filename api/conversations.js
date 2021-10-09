@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const moment = require("moment");
+
 const { validationResult, body } = require("express-validator");
 
 const router = express.Router();
@@ -69,8 +71,53 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 	res.json({ messages: "Successfuly created conversation", _id });
 });
 
+// // GET api/conversations/:conversationId
+// // Get data on users in conversation
+
+// router.get("/:conversationId", auth, async (req, res) => {
+// 	const { conversationId } = req.params;
+
+// 	const validationErrors = validationResult(req);
+// 	if (!validationErrors.isEmpty()) {
+// 		return res.status(400).json({ errors: validationErrors.array() });
+// 	}
+
+// 	// Check conversation exists
+// 	const exists = await Conversation.exists({
+// 		_id: mongoose.Types.ObjectId(conversationId),
+// 	});
+// 	if (!exists) {
+// 		return res.status(404).json({ message: "Conversation does not exist" });
+// 	}
+
+// 	// Check user is in conversation
+// 	const user = await User.findOne({
+// 		username: req.username,
+// 	}).exec();
+
+// 	if (!user.conversations.includes(mongoose.Types.ObjectId(conversationId))) {
+// 		return res.status(401).json({ message: "Unauthorized" });
+// 	}
+
+// 	const conversation = await Conversation.findById(conversationId);
+
+// 	const users = [];
+// 	for (let i = 0; i < conversation.users.length; i++) {
+// 		users.push(await User.findById(conversation.users[i]._id));
+// 	}
+
+// 	res.json({
+// 		users: users.map((user) => {
+// 			return {
+// 				username: user.username,
+// 				profilePicture: user.profilePicture,
+// 			};
+// 		}),
+// 	});
+// });
+
 // GET api/conversations/:conversationId
-// Get data on users in conversation
+// Get conversationn
 
 router.get("/:conversationId", auth, async (req, res) => {
 	const { conversationId } = req.params;
@@ -97,6 +144,36 @@ router.get("/:conversationId", auth, async (req, res) => {
 		return res.status(401).json({ message: "Unauthorized" });
 	}
 
+	// Get sorted messages
+	const messages = (
+		await Conversation.aggregate([
+			{ $match: { _id: new mongoose.mongo.ObjectId(conversationId) } },
+			{ $unwind: "$messages" },
+			{ $sort: { "messages.time": 1 } },
+			{
+				$group: {
+					messages: { $push: "$messages" },
+					_id: 1,
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					messages: 1,
+				},
+			},
+		]).exec()
+	)[0].messages;
+
+	for (let i = 0; i < messages.length; i++) {
+		const message = messages[i];
+		// add user obj, format date
+		message.author = await User.findById(message.author); // TODO: garbage
+		const dateTime = message.time;
+		message.time = moment(dateTime).format("hh:mm A");
+		message.date = moment(dateTime).format("MMM Do, YYYY");
+	}
+
 	const conversation = await Conversation.findById(conversationId);
 
 	const users = [];
@@ -105,6 +182,7 @@ router.get("/:conversationId", auth, async (req, res) => {
 	}
 
 	res.json({
+		messages,
 		users: users.map((user) => {
 			return {
 				username: user.username,
