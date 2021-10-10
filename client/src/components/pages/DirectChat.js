@@ -14,6 +14,7 @@ function DirectChat() {
 
 	const auth = useSelector((state) => state.auth);
 
+	// websocket connection
 	const [client, setClient] = useState(null);
 
 	const [conversations, setConversations] = useState([]);
@@ -23,6 +24,8 @@ function DirectChat() {
 
 	const [textInput, setTextInput] = useState("");
 
+	const [userSearchResult, setUserSearchResult] = useState([]);
+
 	useEffect(() => {
 		// Fetch conversations
 		(async function () {
@@ -30,9 +33,7 @@ function DirectChat() {
 				const res = await axios.get(`/api/conversations`, {
 					withCredentials: true,
 				});
-				setConversations(res.data);
-				// TODO: open latest initially by default
-				openConversation("6161d48eee76e50e2215e3b5");
+				setConversations((prevConvos) => res.data);
 			} catch (err) {
 				// TODO: error
 				console.log(err);
@@ -76,13 +77,6 @@ function DirectChat() {
 						withCredentials: true,
 					}
 				);
-				for (let i = 0; i < res.data.users.length; i++) {
-					if (res.data.users[i].username !== auth.username) {
-						setParticipant((_) => res.data.users[i]);
-						// TODO: do this in API....
-						break;
-					}
-				}
 				setLoading(false);
 				setMessages(res.data.messages);
 			} catch (err) {
@@ -115,6 +109,28 @@ function DirectChat() {
 	function onInputChange(event) {
 		if (textInput.length < 1000) {
 			setTextInput(event.target.value);
+		}
+	}
+
+	function onSearchInputChange(event) {
+		const query = event.target.value;
+		if (query.length > 0) {
+			// Search users
+			(async function () {
+				try {
+					const res = await axios.get(
+						`/api/users/search/?username=${query}`,
+						{
+							withCredentials: true,
+						}
+					);
+					setUserSearchResult(res.data);
+				} catch (err) {
+					console.log(err);
+				}
+			})();
+		} else {
+			setUserSearchResult([]);
 		}
 	}
 
@@ -168,7 +184,13 @@ function DirectChat() {
 	}
 
 	function openConversation(conversationId) {
-		console.log(`open conversation ${conversationId}`);
+		const convo = conversations.find((convo) => {
+			return convo.id.toString() === conversationId.toString();
+		});
+		setParticipant({
+			username: convo.username,
+			profilePicture: convo.profilePicture,
+		});
 		fetchMessages(conversationId);
 		initWS(conversationId);
 	}
@@ -206,7 +228,7 @@ function DirectChat() {
 											<img
 												src={`/images/${convo.profilePicture}`}
 												className="rounded-full w-11 h-11 mr-2"
-												alt="joze"
+												alt={`${convo.username}`}
 											/>
 										</div>
 										<div>
@@ -274,8 +296,8 @@ function DirectChat() {
 								</div>
 							)}
 						</nav>
-						{loading && <Spinner />}
 						<div className="overflow-auto px-1 py-1 h-5/6">
+							{loading && <Spinner />}
 							{renderMessages()}
 						</div>
 
@@ -298,6 +320,58 @@ function DirectChat() {
 										margin: "auto",
 									}}
 								/>
+							</div>
+						</div>
+					</div>
+
+					{/* SEARCH USERS */}
+					<div
+						className="w-3/12 h-2/3 bg-white rounded-r shadow-2xl relative"
+						ref={scrollBoxRef}
+					>
+						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
+							<input
+								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
+								id="search"
+								type="text"
+								placeholder="Search users.."
+								onChange={onSearchInputChange}
+							/>
+						</nav>
+
+						<div className="overflow-auto px-1 py-1 h-5/6">
+							{userSearchResult.map((user) => (
+								<div
+									className="flex flex-row bg-gray-100 justify-between cursor-pointer hover:bg-gray-200"
+									key={user.id}
+									// onClick={(e) =>
+									// 	openConversation(convo.id, e)
+									// }
+								>
+									<div className="flex flex-row p-2 justify-start">
+										<div className="float-left">
+											<img
+												src={`/images/${user.profilePicture}`}
+												className="rounded-full w-11 h-11 mr-2"
+												alt={user.profilePicture}
+											/>
+										</div>
+										<div>
+											<div className="font-medium text-sm font">
+												{user.username}
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<div className="flex  h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
+							<div
+								className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-purple-500 border-purple-500 hover:border-transparent hover:text-white hover:bg-purple-500 mt-4 lg:mt-0"
+								// onClick={logOut}
+							>
+								Add
 							</div>
 						</div>
 					</div>

@@ -122,7 +122,7 @@ function Signup() {
 					onSubmit={onSubmit}
 				>
 					<h2 className="text-4xl text-center text-gray-700 mb-6">
-						Sing Up
+						Sign Up
 					</h2>
 					<div className="mb-5">
 						<label

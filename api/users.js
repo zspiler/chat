@@ -8,12 +8,25 @@ const User = require("../models/User");
 const auth = require("../middleware/auth");
 
 // GET api/users/search
-// Search users
+// Search users, excluding users already in conversation with
 
-router.get("/search", auth, query("username").notEmpty(), (req, res) => {
+router.get("/search", auth, query("username").notEmpty(), async (req, res) => {
 	const validationErrors = validationResult(req);
 	if (!validationErrors.isEmpty()) {
 		return res.status(400).json({ errors: validationErrors.array() });
+	}
+
+	const user = await User.findOne({
+		username: req.username,
+	});
+
+	// Find users already in conversation with
+	let knownUsers = [];
+	for (let i = 0; i < user.conversations.length; i++) {
+		const u = (await Conversation.findById(user.conversations[i])).users;
+		u.forEach((u) => {
+			knownUsers.push(u._id.toString());
+		});
 	}
 
 	User.find(
@@ -28,10 +41,19 @@ router.get("/search", auth, query("username").notEmpty(), (req, res) => {
 				res.status(401).json({ message: "Server error" });
 				return;
 			}
+
 			res.json(
-				users.map((user) => {
-					return { username: user.username };
-				})
+				// Exclude known users
+				users.reduce(function (filtered, user) {
+					if (!knownUsers.includes(user._id.toString())) {
+						filtered.push({
+							username: user.username,
+							id: user._id,
+							profilePicture: user.profilePicture,
+						});
+					}
+					return filtered;
+				}, [])
 			);
 		},
 		{ limit: 15 }

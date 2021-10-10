@@ -4,28 +4,40 @@ import axios from "axios";
 async function call() {
 	(async function () {
 		try {
-			const res = await axios.get(`/api/conversations`, {
+			const res = await axios.get(`/api/users/search/?username=za`, {
 				withCredentials: true,
 			});
+			console.log("RES: ");
+			console.log(res);
 		} catch (err) {
 			console.log(err);
 		}
 	})();
 
-	try {
-		const res = await axios.post(
-			`/api/conversations`,
-			{
-				username: "janez123",
-			},
-			{
-				withCredentials: true,
-			}
-		);
-		console.log("nice");
-	} catch (err) {
-		console.log(err);
-	}
+	// (async function () {
+	// 	try {
+	// 		const res = await axios.get(`/api/conversations`, {
+	// 			withCredentials: true,
+	// 		});
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// })();
+
+	// try {
+	// 	const res = await axios.post(
+	// 		`/api/conversations`,
+	// 		{
+	// 			username: "janez123",
+	// 		},
+	// 		{
+	// 			withCredentials: true,
+	// 		}
+	// 	);
+	// 	console.log("nice");
+	// } catch (err) {
+	// 	console.log(err);
+	// }
 }
 
 function Dev() {

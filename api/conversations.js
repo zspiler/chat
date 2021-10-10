@@ -71,51 +71,6 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 	res.json({ messages: "Successfuly created conversation", _id });
 });
 
-// // GET api/conversations/:conversationId
-// // Get data on users in conversation
-
-// router.get("/:conversationId", auth, async (req, res) => {
-// 	const { conversationId } = req.params;
-
-// 	const validationErrors = validationResult(req);
-// 	if (!validationErrors.isEmpty()) {
-// 		return res.status(400).json({ errors: validationErrors.array() });
-// 	}
-
-// 	// Check conversation exists
-// 	const exists = await Conversation.exists({
-// 		_id: mongoose.Types.ObjectId(conversationId),
-// 	});
-// 	if (!exists) {
-// 		return res.status(404).json({ message: "Conversation does not exist" });
-// 	}
-
-// 	// Check user is in conversation
-// 	const user = await User.findOne({
-// 		username: req.username,
-// 	}).exec();
-
-// 	if (!user.conversations.includes(mongoose.Types.ObjectId(conversationId))) {
-// 		return res.status(401).json({ message: "Unauthorized" });
-// 	}
-
-// 	const conversation = await Conversation.findById(conversationId);
-
-// 	const users = [];
-// 	for (let i = 0; i < conversation.users.length; i++) {
-// 		users.push(await User.findById(conversation.users[i]._id));
-// 	}
-
-// 	res.json({
-// 		users: users.map((user) => {
-// 			return {
-// 				username: user.username,
-// 				profilePicture: user.profilePicture,
-// 			};
-// 		}),
-// 	});
-// });
-
 // GET api/conversations/:conversationId
 // Get conversationn
 
@@ -146,9 +101,9 @@ router.get("/:conversationId", auth, async (req, res) => {
 
 	const conversation = await Conversation.findById(conversationId);
 
+	// Sort messages
 	let messages = [];
 	if (conversation.messages.length > 0) {
-		// Get sorted messages
 		messages = (
 			await Conversation.aggregate([
 				{
@@ -209,10 +164,11 @@ router.get("/", auth, async (req, res) => {
 	const conversations = [];
 
 	// TODO: sort by latest message time
-
 	for (let i = 0; i < user.conversations.length; i++) {
-		const convo = await Conversation.findById(user.conversations[i]).lean();
-		delete convo["messages"];
+		const convo = await Conversation.findById(
+			user.conversations[i],
+			"-messages"
+		).lean();
 
 		let participant = null;
 		for (let i = 0; i < convo.users.length; i++) {
@@ -221,13 +177,12 @@ router.get("/", auth, async (req, res) => {
 				break;
 			}
 		}
-
 		if (convo.latestMessage) {
+			convo.latestMessage.dateTime = convo.latestMessage.time;
 			convo.latestMessage.time = moment(convo.latestMessage.time).format(
 				"hh:mm A"
 			);
 		}
-
 		conversations.push({
 			id: convo._id,
 			username: participant.username,
@@ -235,6 +190,18 @@ router.get("/", auth, async (req, res) => {
 			latestMessage: convo.latestMessage || null,
 		});
 	}
+
+	// Sort by latest message
+	conversations.sort((a, b) => {
+		if (a.latestMessage.dateTime > b.latestMessage.dateTime) {
+			return -1;
+		}
+		if (a.latestMessage.dateTime < b.latestMessage.dateTime) {
+			return 1;
+		}
+		return 0;
+	});
+
 	res.json(conversations);
 });
 

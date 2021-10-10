@@ -78,6 +78,17 @@ function NavigationBar() {
 									Group
 								</NavLink>
 							</div>
+							<div
+								href="#responsive-header"
+								className="block mt-4 lg:inline-block lg:mt-0 text-purple-200 hover:text-white mr-4"
+							>
+								<NavLink
+									to="/contacts"
+									activeClassName="active-tab"
+								>
+									Contacts
+								</NavLink>
+							</div>
 						</React.Fragment>
 					)}
 				</div>
