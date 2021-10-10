@@ -208,6 +208,8 @@ router.get("/", auth, async (req, res) => {
 
 	const conversations = [];
 
+	// TODO: sort by latest message time
+
 	for (let i = 0; i < user.conversations.length; i++) {
 		const convo = await Conversation.findById(user.conversations[i]).lean();
 		delete convo["messages"];
@@ -220,15 +222,17 @@ router.get("/", auth, async (req, res) => {
 			}
 		}
 
-		convo.latestMessage.time = moment(convo.latestMessage.time).format(
-			"hh:mm A"
-		);
+		if (convo.latestMessage) {
+			convo.latestMessage.time = moment(convo.latestMessage.time).format(
+				"hh:mm A"
+			);
+		}
 
 		conversations.push({
 			id: convo._id,
 			username: participant.username,
 			profilePicture: participant.profilePicture,
-			latestMessage: convo.latestMessage,
+			latestMessage: convo.latestMessage || null,
 		});
 	}
 	res.json(conversations);
