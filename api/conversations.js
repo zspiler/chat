@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const moment = require("moment");
 
-const { validationResult, body } = require("express-validator");
+const { validationResult, body, param } = require("express-validator");
 
 const router = express.Router();
 
@@ -48,6 +48,7 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 		messages: [],
 	});
 	await conversation.save();
+	console.log("saved convo");
 
 	// Add conversations to users
 	await User.findOneAndUpdate(
@@ -77,11 +78,6 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 router.get("/:conversationId", auth, async (req, res) => {
 	const { conversationId } = req.params;
 
-	const validationErrors = validationResult(req);
-	if (!validationErrors.isEmpty()) {
-		return res.status(400).json({ errors: validationErrors.array() });
-	}
-
 	// Check conversation exists
 	const exists = await Conversation.exists({
 		_id: mongoose.Types.ObjectId(conversationId),
@@ -96,7 +92,7 @@ router.get("/:conversationId", auth, async (req, res) => {
 	}).exec();
 
 	if (!user.conversations.includes(mongoose.Types.ObjectId(conversationId))) {
-		return res.status(401).json({ message: "Unauthorized" });
+		return res.status(403).json({ message: "Not permitted" });
 	}
 
 	const conversation = await Conversation.findById(conversationId);
@@ -204,5 +200,58 @@ router.get("/", auth, async (req, res) => {
 
 	res.json(conversations);
 });
+
+// DELETE api/conversations/:conversationId
+// Delete conversation
+
+router.delete(
+	"/:conversationId",
+	auth,
+	param("conversationId").notEmpty(),
+	async (req, res) => {
+		const { conversationId } = req.params;
+		console.log(`delete ${conversationId}`);
+
+		const convo = await Conversation.findById(conversationId);
+		if (!convo) {
+			return res
+				.status(404)
+				.json({ message: "Conversation does not exist" });
+		}
+
+		// Check user has permissions
+		const user = await User.findOne({ username: req.username });
+		if (
+			!user.conversations
+				.map((_id) => _id.toString())
+				.includes(conversationId)
+		) {
+			return res.status(403).json({ message: "Not permitted" });
+		}
+
+		const participants = convo.users;
+
+		// Remove conversation document
+		await convo.remove((err) => {
+			if (err) {
+				return res.json({ message: "Failed to delete" });
+			}
+		});
+
+		// Remove conversations id's from participants
+		User.updateMany(
+			{ _id: { $in: participants } },
+			{ $pull: { conversations: conversationId } },
+			function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: "Failed to delete conversation from user",
+					});
+				}
+				res.json({ message: "Successfuly deleted conversation" });
+			}
+		);
+	}
+);
 
 module.exports = router;

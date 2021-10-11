@@ -2,28 +2,7 @@ import React from "react";
 import axios from "axios";
 
 async function call() {
-	(async function () {
-		try {
-			const res = await axios.get(`/api/users/search/?username=za`, {
-				withCredentials: true,
-			});
-			console.log("RES: ");
-			console.log(res);
-		} catch (err) {
-			console.log(err);
-		}
-	})();
-
-	// (async function () {
-	// 	try {
-	// 		const res = await axios.get(`/api/conversations`, {
-	// 			withCredentials: true,
-	// 		});
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 	}
-	// })();
-
+	// CREATE CONVERSATION
 	// try {
 	// 	const res = await axios.post(
 	// 		`/api/conversations`,
@@ -38,6 +17,41 @@ async function call() {
 	// } catch (err) {
 	// 	console.log(err);
 	// }
+	// DELETE CONVERSATION
+	// (async function () {
+	// 	try {
+	// 		const res = await axios.delete(
+	// 			`/api/conversations/616415f469edca81a73ea2c6`,
+	// 			{
+	// 				withCredentials: true,
+	// 			}
+	// 		);
+	// 		console.log("RES: ");
+	// 		console.log(res);
+	// 	} catch (err) {
+	// 		console.log(err.response);
+	// 	}
+	// })();
+	// (async function () {
+	// 	try {
+	// 		const res = await axios.get(`/api/users/search/?username=za`, {
+	// 			withCredentials: true,
+	// 		});
+	// 		console.log("RES: ");
+	// 		console.log(res);
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// })();
+	// (async function () {
+	// 	try {
+	// 		const res = await axios.get(`/api/conversations`, {
+	// 			withCredentials: true,
+	// 		});
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// })();
 }
 
 function Dev() {

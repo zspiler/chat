@@ -195,6 +195,24 @@ function DirectChat() {
 		initWS(conversationId);
 	}
 
+	async function createConversation(userId) {
+		console.log("create convo " + userId);
+		try {
+			await axios.post(
+				`/api/conversations`,
+				{
+					userId,
+				},
+				{
+					withCredentials: true,
+				}
+			);
+		} catch (err) {
+			// TODO: handle error
+			console.log(err);
+		}
+	}
+
 	return (
 		<React.Fragment>
 			<div className="bg bg-gray-200 h-screen">
@@ -338,15 +356,14 @@ function DirectChat() {
 								onChange={onSearchInputChange}
 							/>
 						</nav>
-
 						<div className="overflow-auto px-1 py-1 h-5/6">
 							{userSearchResult.map((user) => (
 								<div
 									className="flex flex-row bg-gray-100 justify-between cursor-pointer hover:bg-gray-200"
 									key={user.id}
-									// onClick={(e) =>
-									// 	openConversation(convo.id, e)
-									// }
+									onClick={(e) =>
+										createConversation(user.id, e)
+									}
 								>
 									<div className="flex flex-row p-2 justify-start">
 										<div className="float-left">
@@ -365,7 +382,7 @@ function DirectChat() {
 								</div>
 							))}
 						</div>
-
+						11{" "}
 						<div className="flex  h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
 							<div
 								className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-purple-500 border-purple-500 hover:border-transparent hover:text-white hover:bg-purple-500 mt-4 lg:mt-0"
