@@ -14,7 +14,7 @@ const Conversation = require("../models/Conversation");
 // POST api/conversations
 // Create conversation
 
-router.post("/", auth, body("username").notEmpty(), async (req, res) => {
+router.post("/", auth, body("userId").notEmpty(), async (req, res) => {
 	const validationErrors = validationResult(req);
 	if (!validationErrors.isEmpty()) {
 		return res.status(400).json({ errors: validationErrors.array() });
@@ -24,9 +24,7 @@ router.post("/", auth, body("username").notEmpty(), async (req, res) => {
 		username: req.username,
 	}).exec();
 
-	const otherUser = await User.findOne({
-		username: req.body.username,
-	}).exec();
+	const otherUser = await User.findById(req.body.userId).exec();
 
 	if (!(loggedInUser && otherUser)) {
 		return res.status(404).json({ message: "Unknown user" });
@@ -187,16 +185,18 @@ router.get("/", auth, async (req, res) => {
 		});
 	}
 
-	// Sort by latest message
-	conversations.sort((a, b) => {
-		if (a.latestMessage.dateTime > b.latestMessage.dateTime) {
-			return -1;
-		}
-		if (a.latestMessage.dateTime < b.latestMessage.dateTime) {
-			return 1;
-		}
-		return 0;
-	});
+	if (conversations.latestMessage) {
+		// Sort by latest message
+		conversations.sort((a, b) => {
+			if (a.latestMessage.dateTime > b.latestMessage.dateTime) {
+				return -1;
+			}
+			if (a.latestMessage.dateTime < b.latestMessage.dateTime) {
+				return 1;
+			}
+			return 0;
+		});
+	}
 
 	res.json(conversations);
 });

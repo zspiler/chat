@@ -7,6 +7,7 @@ import { FiSend } from "react-icons/fi";
 
 import MessageBubble from "../MessageBubble";
 import Spinner from "../layout/Spinner";
+import ConfirmModal from "../layout/ConfirmModal";
 
 function DirectChat() {
 	const scrollBoxRef = useRef();
@@ -25,20 +26,15 @@ function DirectChat() {
 	const [textInput, setTextInput] = useState("");
 
 	const [userSearchResult, setUserSearchResult] = useState([]);
+	const [searchText, setSearchText] = useState("");
+
+	// Create conversation popup
+	const [convoCreateModal, setConvoCreateModal] = useState(false);
+	const [createConvoUser, setCreateConvoUser] = useState(null);
 
 	useEffect(() => {
 		// Fetch conversations
-		(async function () {
-			try {
-				const res = await axios.get(`/api/conversations`, {
-					withCredentials: true,
-				});
-				setConversations((prevConvos) => res.data);
-			} catch (err) {
-				// TODO: error
-				console.log(err);
-			}
-		})();
+		fetchConversations();
 	}, []);
 
 	// Open WebSocket connection for a conversation
@@ -64,6 +60,18 @@ function DirectChat() {
 
 			return wsClient;
 		});
+	}
+
+	async function fetchConversations() {
+		try {
+			const res = await axios.get(`/api/conversations`, {
+				withCredentials: true,
+			});
+			setConversations((prevConvos) => res.data);
+		} catch (err) {
+			// TODO: error
+			console.log(err);
+		}
 	}
 
 	function fetchMessages(conversationId) {
@@ -114,6 +122,7 @@ function DirectChat() {
 
 	function onSearchInputChange(event) {
 		const query = event.target.value;
+		setSearchText(event.target.value);
 		if (query.length > 0) {
 			// Search users
 			(async function () {
@@ -195,24 +204,29 @@ function DirectChat() {
 		initWS(conversationId);
 	}
 
-	async function createConversation(userId) {
-		console.log("create convo " + userId);
-		try {
-			await axios.post(
-				`/api/conversations`,
-				{
-					userId,
-				},
-				{
-					withCredentials: true,
-				}
-			);
-		} catch (err) {
-			// TODO: handle error
-			console.log(err);
-		}
+	async function createConversation(user) {
+		setCreateConvoUser(user);
+		setConvoCreateModal(true);
 	}
 
+	async function onConvoCreateResponse(response) {
+		setConvoCreateModal(false);
+		if (response) {
+			try {
+				await axios.post(
+					`/api/conversations`,
+					{ userId: createConvoUser.id },
+					{ withCredentials: true }
+				);
+				fetchConversations();
+				setUserSearchResult([]);
+				setSearchText("");
+			} catch (err) {
+				// TODO: handle error
+				console.log(err);
+			}
+		}
+	}
 	return (
 		<React.Fragment>
 			<div className="bg bg-gray-200 h-screen">
@@ -295,9 +309,8 @@ function DirectChat() {
 						</div>
 					</div>
 					{/* CHAT */}
-
 					<div
-						className="w-5/12 h-2/3 bg-white rounded-r shadow-2xl relative"
+						className="w-5/12 h-2/3 bg-white shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
 						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
@@ -305,7 +318,7 @@ function DirectChat() {
 								<div className="flex justify-center items-center p-1">
 									<img
 										src={`/images/${participant.profilePicture}`}
-										className="rounded-full ml-3 w-10 h-10"
+										className="rounded-full ml-3 w-10 h-10 p-1"
 										alt={participant.username}
 									/>
 									<span className="text-sm font-medium text-gray-600 ml-2">
@@ -318,7 +331,6 @@ function DirectChat() {
 							{loading && <Spinner />}
 							{renderMessages()}
 						</div>
-
 						<div className="flex h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
 							<input
 								type="text"
@@ -341,19 +353,27 @@ function DirectChat() {
 							</div>
 						</div>
 					</div>
-
 					{/* SEARCH USERS */}
 					<div
 						className="w-3/12 h-2/3 bg-white rounded-r shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
 						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
+							{/* <input
+								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
+								id="search"
+								type="text"
+								placeholder="Start a new conversation.."
+								onChange={onSearchInputChange}
+                                ref={searchInputField}
+							/> */}
 							<input
 								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
 								id="search"
 								type="text"
-								placeholder="Search users.."
+								placeholder="Start a new conversation.."
 								onChange={onSearchInputChange}
+								value={searchText}
 							/>
 						</nav>
 						<div className="overflow-auto px-1 py-1 h-5/6">
@@ -361,9 +381,7 @@ function DirectChat() {
 								<div
 									className="flex flex-row bg-gray-100 justify-between cursor-pointer hover:bg-gray-200"
 									key={user.id}
-									onClick={(e) =>
-										createConversation(user.id, e)
-									}
+									onClick={(e) => createConversation(user, e)}
 								>
 									<div className="flex flex-row p-2 justify-start">
 										<div className="float-left">
@@ -382,18 +400,16 @@ function DirectChat() {
 								</div>
 							))}
 						</div>
-						11{" "}
-						<div className="flex  h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
-							<div
-								className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-purple-500 border-purple-500 hover:border-transparent hover:text-white hover:bg-purple-500 mt-4 lg:mt-0"
-								// onClick={logOut}
-							>
-								Add
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
+			<ConfirmModal
+				onResponse={onConvoCreateResponse}
+				visible={convoCreateModal}
+				text={`Create conversation with '${
+					createConvoUser ? createConvoUser.username : null
+				}'?`}
+			/>
 		</React.Fragment>
 	);
 }
