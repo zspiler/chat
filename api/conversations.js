@@ -185,18 +185,24 @@ router.get("/", auth, async (req, res) => {
 		});
 	}
 
-	if (conversations.latestMessage) {
-		// Sort by latest message
-		conversations.sort((a, b) => {
-			if (a.latestMessage.dateTime > b.latestMessage.dateTime) {
-				return -1;
-			}
-			if (a.latestMessage.dateTime < b.latestMessage.dateTime) {
-				return 1;
-			}
-			return 0;
-		});
-	}
+	// Sort by latest message
+	conversations.sort((a, b) => {
+		if (!a.latestMessage) {
+			return 1;
+		}
+
+		if (!b.lastMessage) {
+			return -1;
+		}
+
+		if (a.latestMessage.dateTime > b.latestMessage.dateTime) {
+			return -1;
+		}
+		if (a.latestMessage.dateTime < b.latestMessage.dateTime) {
+			return 1;
+		}
+		return 0;
+	});
 
 	res.json(conversations);
 });

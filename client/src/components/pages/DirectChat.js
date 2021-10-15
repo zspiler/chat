@@ -155,6 +155,14 @@ function DirectChat() {
 
 	function renderMessages() {
 		var prevDate = null;
+		if (messages.length == 0)
+			return (
+				<div className=" w-full h-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center">
+					<div className="ease-linear rounded-full text-sm text-gray-500 border-gray-200 mb-4">
+						Say hi!
+					</div>
+				</div>
+			);
 		return messages.map((message) => {
 			if (prevDate !== message.date) {
 				prevDate = message.date;
@@ -328,30 +336,39 @@ function DirectChat() {
 							)}
 						</nav>
 						<div className="overflow-auto px-1 py-1 h-5/6">
+							{!participant && (
+								<div className=" w-full h-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center">
+									<div className="ease-linear rounded-full text-sm text-gray-500 border-gray-200 mb-4">
+										Start chatting!
+									</div>
+								</div>
+							)}
 							{loading && <Spinner />}
 							{renderMessages()}
 						</div>
-						<div className="flex h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
-							<input
-								type="text"
-								className="h-8 w-11/12 mx-2 text-xs pl-5 pr-20 bg-gray-100 rounded-lg z-0 focus:shadow focus:outline-none"
-								placeholder="Write something..."
-								onChange={onInputChange}
-								onKeyPress={handleKeypress}
-								value={textInput}
-							/>
-							<div
-								className="m-3 h-8 w-8 flex justify-center align-middle bg-purple-500 rounded-full p-1 transform hover:shadow-lg hover:bg-purple-600 cursor-pointer "
-								onClick={sendMessage}
-							>
-								<FiSend
-									style={{
-										color: "white",
-										margin: "auto",
-									}}
+						{participant && (
+							<div className="flex h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
+								<input
+									type="text"
+									className="h-8 w-11/12 mx-2 text-xs pl-5 pr-20 bg-gray-100 rounded-lg z-0 focus:shadow focus:outline-none"
+									placeholder="Write something..."
+									onChange={onInputChange}
+									onKeyPress={handleKeypress}
+									value={textInput}
 								/>
+								<div
+									className="m-3 h-8 w-8 flex justify-center align-middle bg-purple-500 rounded-full p-1 transform hover:shadow-lg hover:bg-purple-600 cursor-pointer "
+									onClick={sendMessage}
+								>
+									<FiSend
+										style={{
+											color: "white",
+											margin: "auto",
+										}}
+									/>
+								</div>
 							</div>
-						</div>
+						)}
 					</div>
 					{/* SEARCH USERS */}
 					<div

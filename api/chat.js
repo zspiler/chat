@@ -12,7 +12,6 @@ const router = express.Router();
 const conversations = {};
 
 router.ws("/direct/:conversationId", async function (ws, req) {
-	console.log("connect");
 	const { conversationId } = req.params;
 
 	// Authorize user
