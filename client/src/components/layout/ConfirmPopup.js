@@ -1,6 +1,6 @@
 import React from "react";
 
-function ConfirmModal(props) {
+function ConfirmPopup(props) {
 	return (
 		<div
 			className={`${
@@ -16,13 +16,17 @@ function ConfirmModal(props) {
 				<div className="mt-3 flex justify-center space-x-3">
 					<button
 						onClick={() => props.onResponse(false)}
-						className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-white border-purple-500 hover:border-transparent hover:text-white text-purple-500 hover:bg-purple-500 mt-4 lg:mt-0"
+						className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded  border-purple-500 hover:border-transparent hover:text-white text-purple-500 hover:bg-purple-500 mt-4 lg:mt-0"
 					>
 						Cancel
 					</button>
 					<button
 						onClick={() => props.onResponse(true)}
-						className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-white border-green-500 hover:border-transparent hover:text-white text-green-500 hover:bg-green-500 mt-4 lg:mt-0"
+						className={`${
+							props.danger
+								? "text-red-600 hover:bg-red-600 border-red-600"
+								: "text-green-500 hover:bg-green-500 border-green-500"
+						} cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded   hover:border-transparent hover:text-white  mt-4 lg:mt-0`}
 					>
 						Confirm
 					</button>
@@ -32,4 +36,4 @@ function ConfirmModal(props) {
 	);
 }
 
-export default ConfirmModal;
+export default ConfirmPopup;

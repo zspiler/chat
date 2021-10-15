@@ -157,7 +157,6 @@ router.get("/", auth, async (req, res) => {
 
 	const conversations = [];
 
-	// TODO: sort by latest message time
 	for (let i = 0; i < user.conversations.length; i++) {
 		const convo = await Conversation.findById(
 			user.conversations[i],
@@ -190,8 +189,7 @@ router.get("/", auth, async (req, res) => {
 		if (!a.latestMessage) {
 			return 1;
 		}
-
-		if (!b.lastMessage) {
+		if (!b.latestMessage) {
 			return -1;
 		}
 
@@ -216,7 +214,6 @@ router.delete(
 	param("conversationId").notEmpty(),
 	async (req, res) => {
 		const { conversationId } = req.params;
-		console.log(`delete ${conversationId}`);
 
 		const convo = await Conversation.findById(conversationId);
 		if (!convo) {

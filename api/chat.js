@@ -32,39 +32,6 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 		conversations[conversationId] = [{ user: user._id, socket: ws }];
 	}
 
-	// Fetch sorted messages
-	// const convo = (
-	// 	await Conversation.aggregate([
-	// 		{ $match: { _id: new mongoose.mongo.ObjectId(conversationId) } },
-	// 		{ $unwind: "$messages" },
-	// 		{ $sort: { "messages.time": 1 } },
-	// 		{
-	// 			$group: {
-	// 				messages: { $push: "$messages" },
-	// 				_id: 1,
-	// 			},
-	// 		},
-	// 		{
-	// 			$project: {
-	// 				_id: 0,
-	// 				messages: 1,
-	// 			},
-	// 		},
-	// 	]).exec()
-	// )[0];
-
-	// for (let i = 0; i < convo.messages.length; i++) {
-	// 	const message = convo.messages[i];
-
-	// 	// add user obj, format date
-	// 	message.author = await User.findById(message.author);
-	// 	const dateTime = message.time;
-	// 	message.time = moment(dateTime).format("hh:mm A");
-	// 	message.date = moment(dateTime).format("MMM Do, YYYY");
-
-	// 	ws.send(JSON.stringify(message));
-	// }
-
 	ws.on("message", async function (message) {
 		const payload = JSON.parse(message);
 
@@ -76,6 +43,7 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 			return false;
 		}
 
+		// Update conversation
 		const updatedConvo = await Conversation.findOneAndUpdate(
 			{ _id: conversationId },
 			{
@@ -96,10 +64,7 @@ router.ws("/direct/:conversationId", async function (ws, req) {
 		const newMessage =
 			updatedConvo.messages[updatedConvo.messages.length - 1];
 
-		// Update conversation's latest message
-
 		// Process message for client
-
 		newMessage.author = {
 			username: user.username,
 			profilePicture: user.profilePicture,

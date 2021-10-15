@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { w3cwebsocket } from "websocket";
 
-import { FiSend } from "react-icons/fi";
+import { FiX, FiSend } from "react-icons/fi";
 
 import MessageBubble from "../MessageBubble";
 import Spinner from "../layout/Spinner";
-import ConfirmModal from "../layout/ConfirmModal";
+import ConfirmPopup from "../layout/ConfirmPopup";
 
 function DirectChat() {
 	const scrollBoxRef = useRef();
@@ -25,12 +25,17 @@ function DirectChat() {
 
 	const [textInput, setTextInput] = useState("");
 
+	// User search
 	const [userSearchResult, setUserSearchResult] = useState([]);
 	const [searchText, setSearchText] = useState("");
 
-	// Create conversation popup
+	// Create-conversation popup
 	const [convoCreateModal, setConvoCreateModal] = useState(false);
 	const [createConvoUser, setCreateConvoUser] = useState(null);
+
+	// Delete-conversation popup
+	const [convoDeleteModal, setConvoDeleteModal] = useState(false);
+	const [deleteConvoId, setDeleteConvoId] = useState(null);
 
 	useEffect(() => {
 		// Fetch conversations
@@ -155,7 +160,7 @@ function DirectChat() {
 
 	function renderMessages() {
 		var prevDate = null;
-		if (messages.length == 0)
+		if (participant && messages.length === 0)
 			return (
 				<div className=" w-full h-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center">
 					<div className="ease-linear rounded-full text-sm text-gray-500 border-gray-200 mb-4">
@@ -212,9 +217,37 @@ function DirectChat() {
 		initWS(conversationId);
 	}
 
-	async function createConversation(user) {
+	// Deleting conversation
+	function createConversation(user) {
 		setCreateConvoUser(user);
 		setConvoCreateModal(true);
+	}
+
+	async function onConvoDeleteResponse(response) {
+		setConvoDeleteModal(false);
+		if (response) {
+			try {
+				await axios.delete(`/api/conversations/${deleteConvoId}`, {
+					withCredentials: true,
+				});
+				fetchConversations();
+				setParticipant(null);
+				setMessages([]);
+				setDeleteConvoId(null);
+			} catch (err) {
+				// TODO: handle error
+				console.log(err);
+			}
+		}
+	}
+
+	// Creating conversation
+	function deleteConversation(user) {
+		setDeleteConvoId(
+			conversations.find((c) => c.username === user.username).id
+		);
+
+		setConvoDeleteModal(true);
 	}
 
 	async function onConvoCreateResponse(response) {
@@ -229,6 +262,7 @@ function DirectChat() {
 				fetchConversations();
 				setUserSearchResult([]);
 				setSearchText("");
+				setCreateConvoUser(null);
 			} catch (err) {
 				// TODO: handle error
 				console.log(err);
@@ -321,18 +355,28 @@ function DirectChat() {
 						className="w-5/12 h-2/3 bg-white shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
-						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
+						<nav className="flex justify-between w-full h-14 border-b border-gray-200 flex justify-between items-center">
 							{participant && (
-								<div className="flex justify-center items-center p-1">
-									<img
-										src={`/images/${participant.profilePicture}`}
-										className="rounded-full ml-3 w-10 h-10 p-1"
-										alt={participant.username}
-									/>
-									<span className="text-sm font-medium text-gray-600 ml-2">
-										{participant.username}
-									</span>
-								</div>
+								<React.Fragment>
+									<div className="flex justify-center items-center p-1">
+										<img
+											src={`/images/${participant.profilePicture}`}
+											className="rounded-full ml-3 w-10 h-10 p-1"
+											alt={participant.username}
+										/>
+										<span className="text-sm font-medium text-gray-600 ml-2">
+											{participant.username}
+										</span>
+									</div>
+									<div
+										className="m-4 cursor-pointer"
+										onClick={(e) =>
+											deleteConversation(participant, e)
+										}
+									>
+										<FiX />
+									</div>
+								</React.Fragment>
 							)}
 						</nav>
 						<div className="overflow-auto px-1 py-1 h-5/6">
@@ -356,8 +400,13 @@ function DirectChat() {
 									onKeyPress={handleKeypress}
 									value={textInput}
 								/>
+
 								<div
-									className="m-3 h-8 w-8 flex justify-center align-middle bg-purple-500 rounded-full p-1 transform hover:shadow-lg hover:bg-purple-600 cursor-pointer "
+									className={`m-3 h-9 w-9 flex justify-center align-middle  rounded-full p-1 transform ${
+										textInput.length > 0
+											? "shadow-sm hover:shadow-md bg-purple-500 hover:bg-purple-700 cursor-pointer"
+											: "bg-gray-400"
+									} `}
 									onClick={sendMessage}
 								>
 									<FiSend
@@ -376,14 +425,6 @@ function DirectChat() {
 						ref={scrollBoxRef}
 					>
 						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
-							{/* <input
-								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
-								id="search"
-								type="text"
-								placeholder="Start a new conversation.."
-								onChange={onSearchInputChange}
-                                ref={searchInputField}
-							/> */}
 							<input
 								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
 								id="search"
@@ -420,12 +461,18 @@ function DirectChat() {
 					</div>
 				</div>
 			</div>
-			<ConfirmModal
+			<ConfirmPopup
 				onResponse={onConvoCreateResponse}
 				visible={convoCreateModal}
 				text={`Create conversation with '${
 					createConvoUser ? createConvoUser.username : null
 				}'?`}
+			/>
+			<ConfirmPopup
+				onResponse={onConvoDeleteResponse}
+				visible={convoDeleteModal}
+				text="Delete conversation?"
+				danger={true}
 			/>
 		</React.Fragment>
 	);
