@@ -30,11 +30,11 @@ function DirectChat() {
 	const [searchText, setSearchText] = useState("");
 
 	// Create-conversation popup
-	const [convoCreateModal, setConvoCreateModal] = useState(false);
+	const [createConvoPopup, setCreateConvoPopup] = useState(false);
 	const [createConvoUser, setCreateConvoUser] = useState(null);
 
 	// Delete-conversation popup
-	const [convoDeleteModal, setConvoDeleteModal] = useState(false);
+	const [deleteConvoPopup, setDeleteConvoPopup] = useState(false);
 	const [deleteConvoId, setDeleteConvoId] = useState(null);
 
 	useEffect(() => {
@@ -220,11 +220,11 @@ function DirectChat() {
 	// Deleting conversation
 	function createConversation(user) {
 		setCreateConvoUser(user);
-		setConvoCreateModal(true);
+		setCreateConvoPopup(true);
 	}
 
 	async function onConvoDeleteResponse(response) {
-		setConvoDeleteModal(false);
+		setDeleteConvoPopup(false);
 		if (response) {
 			try {
 				await axios.delete(`/api/conversations/${deleteConvoId}`, {
@@ -247,11 +247,11 @@ function DirectChat() {
 			conversations.find((c) => c.username === user.username).id
 		);
 
-		setConvoDeleteModal(true);
+		setDeleteConvoPopup(true);
 	}
 
 	async function onConvoCreateResponse(response) {
-		setConvoCreateModal(false);
+		setCreateConvoPopup(false);
 		if (response) {
 			try {
 				await axios.post(
@@ -272,17 +272,17 @@ function DirectChat() {
 	return (
 		<React.Fragment>
 			<div className="bg bg-gray-200 h-screen">
-				<div className="flex justify-center h-screen mt-24">
+				<div className="flex flex-col md:flex-row  justify-center h-screen sm:mt-24">
 					{/* CONVERSATIONS */}
-					<div className="w-2/12 h-2/3 bg-white rounded-l shadow-2xl">
-						<nav className="w-full h-14 border-b border-gray-300 flex justify-between items-center">
-							<div className="flex justify-center items-center p-1">
+					<div className="md:w-3/12 h-2/3 bg-white rounded-l shadow-2xl">
+						<nav className="w-full h-16 border-b border-gray-300 flex justify-between items-center">
+							<div className="flex justify-center items-center">
 								<img
 									src={`/images/${auth.profilePicture}`}
-									className="rounded-full ml-2 w-12 h-12"
+									className="rounded-full ml-3 h-8 w-8 sm:w-9 sm:h-9"
 									alt={auth.username}
 								/>
-								<span className="text-md text-gray-800 ml-2">
+								<span className="text-md font-light text-gray-800 ml-2">
 									{auth.username}
 								</span>
 							</div>
@@ -321,41 +321,18 @@ function DirectChat() {
 									</div>
 								</div>
 							))}
-							{/* {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1].map(
-								(_) => (
-									<div className="flex flex-row justify-between">
-										<div className="flex flex-row p-2 justify-start">
-											<div className="float-left">
-												<img
-													src={`/images/default.png`}
-													className="rounded-full w-11 h-11 mr-2"
-													alt="joze"
-												/>
-											</div>
-											<div>
-												<div className="font-medium text-sm font">
-													Janez123
-												</div>
-												<div className="text-xs text-gray-700">
-													Text fake..
-												</div>
-											</div>
-										</div>
-
-										<div className="text-xs p-3 text-gray-300">
-											01:05AM
-										</div>
-									</div>
-								)
-							)} */}
 						</div>
 					</div>
 					{/* CHAT */}
 					<div
-						className="w-5/12 h-2/3 bg-white shadow-2xl relative"
+						className="mt-8 md:mt-0 md:w-5/12 h-2/3 bg-white shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
-						<nav className="flex justify-between w-full h-14 border-b border-gray-200 flex justify-between items-center">
+						<nav
+							className={`flex w-full h-16 ${
+								participant && "border-b"
+							} border-gray-200 justify-between items-center`}
+						>
 							{participant && (
 								<React.Fragment>
 									<div className="flex justify-center items-center p-1">
@@ -391,7 +368,7 @@ function DirectChat() {
 							{renderMessages()}
 						</div>
 						{participant && (
-							<div className="flex h-12 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
+							<div className="flex h-16 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
 								<input
 									type="text"
 									className="h-8 w-11/12 mx-2 text-xs pl-5 pr-20 bg-gray-100 rounded-lg z-0 focus:shadow focus:outline-none"
@@ -401,7 +378,7 @@ function DirectChat() {
 									value={textInput}
 								/>
 
-								<div
+								<button
 									className={`m-3 h-9 w-9 flex justify-center align-middle  rounded-full p-1 transform ${
 										textInput.length > 0
 											? "shadow-sm hover:shadow-md bg-purple-500 hover:bg-purple-700 cursor-pointer"
@@ -415,16 +392,16 @@ function DirectChat() {
 											margin: "auto",
 										}}
 									/>
-								</div>
+								</button>
 							</div>
 						)}
 					</div>
 					{/* SEARCH USERS */}
 					<div
-						className="w-3/12 h-2/3 bg-white rounded-r shadow-2xl relative"
+						className="mt-8 md:mt-0 md:w-3/12 h-2/3 bg-white rounded-r shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
-						<nav className="w-full h-14 border-b border-gray-200 flex justify-between items-center">
+						<nav className="w-full h-16 border-b border-gray-200 flex justify-between items-center">
 							<input
 								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
 								id="search"
@@ -463,15 +440,15 @@ function DirectChat() {
 			</div>
 			<ConfirmPopup
 				onResponse={onConvoCreateResponse}
-				visible={convoCreateModal}
+				visible={createConvoPopup}
 				text={`Create conversation with '${
 					createConvoUser ? createConvoUser.username : null
 				}'?`}
 			/>
 			<ConfirmPopup
 				onResponse={onConvoDeleteResponse}
-				visible={convoDeleteModal}
-				text="Delete conversation?"
+				visible={deleteConvoPopup}
+				text="Delete conversation? All messages will be lost for both users!"
 				danger={true}
 			/>
 		</React.Fragment>

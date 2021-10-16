@@ -40,7 +40,7 @@ function NavigationBar() {
 					</span>
 				</div>
 			</Link>
-			<div className="block lg:hidden">
+			{/* <div className="block lg:hidden">
 				<button className="flex items-center px-3 py-2 border rounded text-purple-200 border-purple-400 hover:text-white hover:border-white">
 					<svg
 						className="fill-current h-3 w-3"
@@ -51,14 +51,16 @@ function NavigationBar() {
 						<path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
 					</svg>
 				</button>
-			</div>
-			<div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-				<div className="lg:flex-grow">
+			</div> */}
+			{/* <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto"> */}
+			{/* <div className="lg:flex-grow"> */}
+			<div className="w-full block flex-grow sm:flex sm:items-center sm:w-auto">
+				<div className="sm:flex-grow">
 					{auth.token && (
 						<React.Fragment>
 							<div
 								href="#responsive-header"
-								className="block mt-4 lg:inline-block lg:mt-0 text-purple-200 hover:text-white mr-4"
+								className="block mt-4 sm:inline-block sm:mt-0 text-purple-200 hover:text-white hover:border-b hover:border-gray-300 mr-4"
 							>
 								<NavLink
 									to="/direct"
@@ -69,7 +71,7 @@ function NavigationBar() {
 							</div>
 							<div
 								href="#responsive-header"
-								className="block mt-4 lg:inline-block lg:mt-0 text-purple-200 hover:text-white mr-4"
+								className="block mt-4 sm:inline-block sm:mt-0 text-purple-200 hover:text-white hover:border-b hover:border-gray-300 mr-4"
 							>
 								<NavLink
 									to="/group"
@@ -78,57 +80,48 @@ function NavigationBar() {
 									Group
 								</NavLink>
 							</div>
-							<div
-								href="#responsive-header"
-								className="block mt-4 lg:inline-block lg:mt-0 text-purple-200 hover:text-white mr-4"
-							>
-								<NavLink
-									to="/contacts"
-									activeClassName="active-tab"
-								>
-									Contacts
-								</NavLink>
-							</div>
 						</React.Fragment>
 					)}
 				</div>
 
 				<div>
-					<div className="flex space-x-4">
+					<div className="flex flex-col sm:flex-row sm:space-x-4">
 						{auth.token && (
 							<React.Fragment>
-								<span className="text-white py-2 align-middle">
+								<span className="font-light text-white text-opacity-70 py-2 align-middle">
 									Hello, {auth.username}!
 								</span>
 								<img
-									className="inline-block rounded-full border border-gray-100 shadow-sm h-8 w-8"
+									className="inline-block hidden sm:block rounded-full border border-opacity-80 border-solid shadow-sm h-8 w-8"
 									src={`/images/${auth.profilePicture}`}
 									alt={`${auth.username}`}
 								/>
 							</React.Fragment>
 						)}
 						{auth.token && (
-							<div
-								className="cursor-pointer inline-block text-sm px-4 py-3 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 lg:mt-0"
-								onClick={logOut}
-							>
-								Log Out
-							</div>
+							<React.Fragment>
+								<button
+									className="cursor-pointer w-1/3 sm:w-auto text-xs sm:text-sm px-4 py-3 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0"
+									onClick={logOut}
+								>
+									Log Out
+								</button>
+							</React.Fragment>
 						)}
 						<React.Fragment>
 							{!auth.token && location.pathname !== "/login" && (
 								<Link to="/login">
-									<div className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 lg:mt-0">
+									<button className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
 										Login
-									</div>
+									</button>
 								</Link>
 							)}
 
 							{!auth.token && location.pathname !== "/signup" && (
 								<Link to="/signup">
-									<div className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 lg:mt-0">
+									<button className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
 										Sign Up
-									</div>
+									</button>
 								</Link>
 							)}
 						</React.Fragment>

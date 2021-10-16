@@ -118,10 +118,10 @@ function Signup() {
 		<React.Fragment>
 			<div className="flex items-center justify-center h-screen p-16">
 				<form
-					className="w-full max-w-sm md:max-w-l"
+					className="w-full w-5/6 sm:max-w-2xl xl:max-w-4xl"
 					onSubmit={onSubmit}
 				>
-					<h2 className="text-4xl text-center text-gray-700 mb-6">
+					<h2 className="text-3xl sm:text-4xl text-center text-gray-700 mb-6">
 						Sign Up
 					</h2>
 					<div className="mb-5">
