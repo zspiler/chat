@@ -145,6 +145,9 @@ router.post("/login", async (req, res) => {
 router.post("/token", auth, async (req, res) => {
 	const username = jwt_decode(req.cookies.chat_token).username;
 	const user = await User.findOne({ username });
+	if (!user) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
 
 	const token = jwt.sign({ username, id: user._id }, process.env.JWT_SECRET, {
 		expiresIn: 86400,
