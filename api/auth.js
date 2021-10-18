@@ -1,6 +1,6 @@
 const express = require("express");
 const { validationResult, body } = require("express-validator");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const jwt_decode = require("jwt-decode");
 const multer = require("multer");

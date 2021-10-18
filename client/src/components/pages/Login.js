@@ -42,7 +42,7 @@ function Login() {
 		<React.Fragment>
 			<div className="flex items-center justify-center h-screen">
 				<form
-					className="w-5/6 sm:max-w-2xl xl:max-w-4xl"
+					className="w-4/5 sm:max-w-2xl 2xl:max-w-4xl"
 					onSubmit={onSubmit}
 				>
 					<h1 className="text-3xl sm:text-4xl text-center text-gray-700">

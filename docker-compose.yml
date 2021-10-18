@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    server:
+        build: .
+        ports:
+            - "5000:5000"
+        volumes:
+            - .:/usr/src/app/
+    client:
+        build: ./client
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./client/src:/usr/src/app/src

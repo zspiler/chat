@@ -21,6 +21,8 @@ export const loginUser = createAsyncThunk(
 	async (formData) => {
 		// payload creator
 		try {
+			console.log("logging in ...");
+
 			const res = await axios.post(
 				"/api/auth/login",
 				{
