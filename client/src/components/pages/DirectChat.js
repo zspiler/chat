@@ -38,33 +38,30 @@ function DirectChat() {
 	const [deleteConvoId, setDeleteConvoId] = useState(null);
 
 	useEffect(() => {
-		// Fetch conversations
 		fetchConversations();
 	}, []);
 
 	// Open WebSocket connection for a conversation
 	function initWS(conversationId) {
-		setClient((_) => {
-			const wsClient = new w3cwebsocket(
-				`ws://localhost:5000/api/chat/direct/${conversationId}`
-			);
-			wsClient.onopen = () => {
-				console.log("Client Connected");
-			};
-			wsClient.onmessage = (message) => {
-				try {
-					const msg = JSON.parse(message.data);
-					setMessages((previousState) => [...previousState, msg]);
-					scrollToLatestMessage();
-				} catch (error) {
-					// TODO:
-					console.log("Error!");
-					console.log(error);
-				}
-			};
+		const wsClient = new w3cwebsocket(
+			`ws://localhost:5000/api/chat/direct/${conversationId}`
+		);
+		wsClient.onopen = () => {
+			console.log("Client Connected");
+		};
+		wsClient.onmessage = (message) => {
+			try {
+				const msg = JSON.parse(message.data);
+				setMessages((previousState) => [...previousState, msg]);
+				scrollToLatestMessage();
+			} catch (error) {
+				// TODO:
+				console.log("Error!");
+				console.log(error);
+			}
+		};
 
-			return wsClient;
-		});
+		setClient(wsClient);
 	}
 
 	async function fetchConversations() {
@@ -72,7 +69,8 @@ function DirectChat() {
 			const res = await axios.get(`/api/conversations`, {
 				withCredentials: true,
 			});
-			setConversations((prevConvos) => res.data);
+
+			setConversations(res.data);
 		} catch (err) {
 			// TODO: error
 			console.log(err);
@@ -311,7 +309,14 @@ function DirectChat() {
 											</div>
 											<div className="text-xs text-gray-700">
 												{convo.latestMessage &&
-													convo.latestMessage.text}
+													(convo.latestMessage.text
+														.length > 5
+														? convo.latestMessage.text.slice(
+																0,
+																5
+														  ) + "..."
+														: convo.latestMessage
+																.text)}
 											</div>
 										</div>
 									</div>
@@ -406,7 +411,7 @@ function DirectChat() {
 								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
 								id="search"
 								type="text"
-								placeholder="Start a new conversation.."
+								placeholder="Search for users.."
 								onChange={onSearchInputChange}
 								value={searchText}
 							/>

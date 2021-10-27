@@ -13,7 +13,7 @@ function Welcome() {
 						Chat
 					</h1>
 					<p className="leading-normal text-2xl mb-8">
-						Used by SpongeBob, Patrick etc!
+						Used by famous individuals!
 					</p>
 
 					<div>

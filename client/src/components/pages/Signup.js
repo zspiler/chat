@@ -49,7 +49,7 @@ function Signup() {
 			dispatch(signupUser(data))
 				.unwrap()
 				.then(() => {
-					history.replace("/");
+					history.replace("/direct");
 				})
 				.catch((_) => {});
 		}

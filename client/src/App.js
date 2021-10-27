@@ -30,7 +30,8 @@ function App() {
 					<Redirect to="/welcome" />
 				</Route>
 				<Route path="/welcome" exact>
-					<Welcome />
+					{auth.token && <Redirect to="/direct" />}
+					{!auth.token && <Welcome />}
 				</Route>
 				<Route path="/login" exact>
 					{!auth.token && <Login />}
