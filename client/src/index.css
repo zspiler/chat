@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.btn {
+	@apply cursor-pointer rounded border;
+}
+
 .active-tab {
 	@apply text-white;
 }
@@ -32,7 +36,23 @@
 	}
 }
 
-.truncatecustom {
+.line_breaks {
+	-ms-word-break: break-all;
+	word-break: break-all;
+
+	/* Non standard for webkit */
+	word-break: break-word;
+
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
+	hyphens: auto;
+}
+
+.truncate {
+	width: 70px;
+	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	min-width: 0;
 }

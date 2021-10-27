@@ -78,7 +78,7 @@ function NavigationBar() {
 									Hello, {auth.username}!
 								</span>
 								<img
-									className="inline-block hidden sm:block rounded-full border border-opacity-80 border-solid shadow-sm h-8 w-8"
+									className="hidden sm:block rounded-full my-auto border border-opacity-80 border-solid shadow-sm h-8 w-8"
 									src={`/images/${auth.profilePicture}`}
 									alt={`${auth.username}`}
 								/>
@@ -87,7 +87,7 @@ function NavigationBar() {
 						{auth.token && (
 							<React.Fragment>
 								<button
-									className="cursor-pointer w-1/3 sm:w-auto text-xs sm:text-sm px-4 py-3 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0"
+									className="btn w-1/3 sm:w-auto text-sm leading-none px-4 py-3 text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0"
 									onClick={logOut}
 								>
 									Log Out
@@ -97,7 +97,7 @@ function NavigationBar() {
 						<React.Fragment>
 							{!auth.token && location.pathname !== "/login" && (
 								<Link to="/login">
-									<button className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
+									<button className="btn ml-2 text-sm px-4 py-2 text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
 										Login
 									</button>
 								</Link>
@@ -105,7 +105,7 @@ function NavigationBar() {
 
 							{!auth.token && location.pathname !== "/signup" && (
 								<Link to="/signup">
-									<button className="inline-block ml-2 text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
+									<button className="btn ml-2 text-sm px-4 py-2 text-white border-white hover:border-transparent hover:text-purple-500 hover:bg-white mt-4 sm:mt-0">
 										Sign Up
 									</button>
 								</Link>

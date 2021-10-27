@@ -46,9 +46,6 @@ function DirectChat() {
 		const wsClient = new w3cwebsocket(
 			`ws://localhost:5000/api/chat/direct/${conversationId}`
 		);
-		wsClient.onopen = () => {
-			console.log("Client Connected");
-		};
 		wsClient.onmessage = (message) => {
 			try {
 				const msg = JSON.parse(message.data);
@@ -90,6 +87,8 @@ function DirectChat() {
 				);
 				setLoading(false);
 				setMessages(res.data.messages);
+
+				scrollToLatestMessage();
 			} catch (err) {
 				setLoading(false);
 				// TODO: error
@@ -147,12 +146,14 @@ function DirectChat() {
 	}
 
 	function scrollToLatestMessage() {
-		if (latestMessageRef.current) {
-			latestMessageRef.current.scrollIntoView({
-				behavior: "smooth",
-				block: "nearest",
-				inline: "start",
-			});
+		if (messages.length > 0) {
+			if (latestMessageRef.current) {
+				latestMessageRef.current.scrollIntoView({
+					behavior: "smooth",
+					block: "nearest",
+					inline: "start",
+				});
+			}
 		}
 	}
 
@@ -168,6 +169,7 @@ function DirectChat() {
 			);
 		return messages.map((message) => {
 			if (prevDate !== message.date) {
+				// display Date
 				prevDate = message.date;
 				return (
 					<React.Fragment key={message.date}>
@@ -180,7 +182,7 @@ function DirectChat() {
 							</span>
 						</div>
 						<div ref={latestMessageRef} key={message._id}>
-							{scrollToLatestMessage()}
+							{/* {scrollToLatestMessage()} */}
 							<MessageBubble
 								message={message}
 								fromLoggedIn={
@@ -193,7 +195,7 @@ function DirectChat() {
 			}
 			return (
 				<div ref={latestMessageRef} key={message._id}>
-					{scrollToLatestMessage()}
+					{/* {scrollToLatestMessage()} */}
 					<MessageBubble
 						message={message}
 						fromLoggedIn={message.author.username === auth.username}
@@ -269,10 +271,10 @@ function DirectChat() {
 	}
 	return (
 		<React.Fragment>
-			<div className="bg bg-gray-200 h-screen">
-				<div className="flex flex-col md:flex-row  justify-center h-screen sm:mt-24">
+			<div className="bg-gray-200 h-screen flex justify-center">
+				<div className="flex flex-col md:flex-row justify-center h-2/3 w-5/6 sm:mt-24">
 					{/* CONVERSATIONS */}
-					<div className="md:w-3/12 h-2/3 bg-white rounded-l shadow-2xl">
+					<div className="md:w-3/12 h-full bg-white rounded-l shadow-2xl">
 						<nav className="w-full h-16 border-b border-gray-300 flex justify-between items-center">
 							<div className="flex justify-center items-center">
 								<img
@@ -296,27 +298,18 @@ function DirectChat() {
 									}
 								>
 									<div className="flex flex-row p-2 justify-start">
-										<div className="float-left">
-											<img
-												src={`/images/${convo.profilePicture}`}
-												className="rounded-full w-11 h-11 mr-2"
-												alt={`${convo.username}`}
-											/>
-										</div>
+										<img
+											src={`/images/${convo.profilePicture}`}
+											className="rounded-full w-11 h-11 mr-2"
+											alt={`${convo.username}`}
+										/>
 										<div>
 											<div className="font-medium text-sm font">
 												{convo.username}
 											</div>
-											<div className="text-xs text-gray-700">
+											<div className="text-xs text-gray-500 truncate">
 												{convo.latestMessage &&
-													(convo.latestMessage.text
-														.length > 5
-														? convo.latestMessage.text.slice(
-																0,
-																5
-														  ) + "..."
-														: convo.latestMessage
-																.text)}
+													convo.latestMessage.text}
 											</div>
 										</div>
 									</div>
@@ -330,7 +323,7 @@ function DirectChat() {
 					</div>
 					{/* CHAT */}
 					<div
-						className="mt-8 md:mt-0 md:w-5/12 h-2/3 bg-white shadow-2xl relative"
+						className="flex flex-col mt-8 h-full md:mt-0 md:w-5/12  bg-white shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
 						<nav
@@ -361,7 +354,7 @@ function DirectChat() {
 								</React.Fragment>
 							)}
 						</nav>
-						<div className="overflow-auto px-1 py-1 h-5/6">
+						<div className="overflow-y-auto px-1 py-1 h-5/6">
 							{!participant && (
 								<div className=" w-full h-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center">
 									<div className="ease-linear rounded-full text-sm text-gray-500 border-gray-200 mb-4">
@@ -373,7 +366,7 @@ function DirectChat() {
 							{renderMessages()}
 						</div>
 						{participant && (
-							<div className="flex h-16 w-full absolute bottom-0 bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
+							<div className="flex h-16 w-full bg-white justify-between items-center px-1 border-t border-gray-200 rounded-br">
 								<input
 									type="text"
 									className="h-8 w-11/12 mx-2 text-xs pl-5 pr-20 bg-gray-100 rounded-lg z-0 focus:shadow focus:outline-none"
@@ -403,7 +396,7 @@ function DirectChat() {
 					</div>
 					{/* SEARCH USERS */}
 					<div
-						className="mt-8 md:mt-0 md:w-3/12 h-2/3 bg-white rounded-r shadow-2xl relative"
+						className="mt-8 md:mt-0 md:w-3/12 h-full bg-white rounded-r shadow-2xl relative"
 						ref={scrollBoxRef}
 					>
 						<nav className="w-full h-16 border-b border-gray-200 flex justify-between items-center">

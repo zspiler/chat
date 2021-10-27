@@ -7,7 +7,7 @@ function MessageBubble(props) {
 				className="flex mt-2 justify-end items-end"
 				key={props.message._id}
 			>
-				<span className="flex bg-purple-600 h-auto text-gray-200 rounded-br-none text-xs rounded-lg p-2 items-end justify-end">
+				<span className="line_breaks flex bg-purple-600 h-auto text-gray-200 rounded-br-none text-xs rounded-lg p-2 items-end justify-end">
 					{props.message.text}
 					<span
 						className="text-gray-300 pl-1"
@@ -32,7 +32,7 @@ function MessageBubble(props) {
 				className="rounded-full shadow-xl w-5 h-5 mr-2"
 				alt={props.message.author.username}
 			/>
-			<span className="flex h-auto bg-gray-300 text-gray-800 font-normal rounded-lg text-xs rounded-bl-none p-2 items-end">
+			<span className="line_breaks flex h-auto bg-gray-300 text-gray-800 font-normal rounded-lg text-xs rounded-bl-none p-2 items-end">
 				{props.message.text}
 				<span
 					className="text-gray-500 pl-1"

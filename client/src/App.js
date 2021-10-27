@@ -10,7 +10,6 @@ import NavigationBar from "./components/layout/NavigationBar";
 import DirectChat from "./components/pages/DirectChat";
 import GroupChat from "./components/pages/GroupChat";
 import PrivateRoute from "./components/PrivateRoute";
-import Dev from "./components/pages/Dev";
 
 import { getUser } from "./store/auth-slice";
 
@@ -40,9 +39,6 @@ function App() {
 				<Route path="/signup" exact>
 					{!auth.token && <Signup />}
 					{auth.token && <Redirect to="/welcome" />}
-				</Route>
-				<Route path="/dev" exact>
-					<Dev />
 				</Route>
 				<PrivateRoute path="/direct" exact={true}>
 					<DirectChat />

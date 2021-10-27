@@ -227,7 +227,6 @@ function Signup() {
 														e.target.files[0]
 													)
 												}
-												// accept=".jpg, .png, .jpeg"
 											/>
 										</label>
 										<p className="pl-1">or drag and drop</p>
