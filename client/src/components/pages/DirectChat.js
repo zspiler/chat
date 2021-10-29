@@ -8,9 +8,10 @@ import { FiX, FiSend } from "react-icons/fi";
 import MessageBubble from "../MessageBubble";
 import Spinner from "../layout/Spinner";
 import ConfirmPopup from "../layout/ConfirmPopup";
+import ConversationsList from "../ConversationsList";
+import UserSearch from "../UserSearch";
 
 function DirectChat() {
-	const scrollBoxRef = useRef();
 	const latestMessageRef = useRef();
 
 	const auth = useSelector((state) => state.auth);
@@ -25,8 +26,8 @@ function DirectChat() {
 
 	const [textInput, setTextInput] = useState("");
 
-	// User search
-	const [userSearchResult, setUserSearchResult] = useState([]);
+	// Searching users
+	const [userSearchResults, setUserSearchResult] = useState([]);
 	const [searchText, setSearchText] = useState("");
 
 	// Create-conversation popup
@@ -122,29 +123,6 @@ function DirectChat() {
 		}
 	}
 
-	function onSearchInputChange(event) {
-		const query = event.target.value;
-		setSearchText(event.target.value);
-		if (query.length > 0) {
-			// Search users
-			(async function () {
-				try {
-					const res = await axios.get(
-						`/api/users/search/?username=${query}`,
-						{
-							withCredentials: true,
-						}
-					);
-					setUserSearchResult(res.data);
-				} catch (err) {
-					console.log(err);
-				}
-			})();
-		} else {
-			setUserSearchResult([]);
-		}
-	}
-
 	function scrollToLatestMessage() {
 		if (messages.length > 0) {
 			if (latestMessageRef.current) {
@@ -182,7 +160,6 @@ function DirectChat() {
 							</span>
 						</div>
 						<div ref={latestMessageRef} key={message._id}>
-							{/* {scrollToLatestMessage()} */}
 							<MessageBubble
 								message={message}
 								fromLoggedIn={
@@ -195,7 +172,6 @@ function DirectChat() {
 			}
 			return (
 				<div ref={latestMessageRef} key={message._id}>
-					{/* {scrollToLatestMessage()} */}
 					<MessageBubble
 						message={message}
 						fromLoggedIn={message.author.username === auth.username}
@@ -269,63 +245,42 @@ function DirectChat() {
 			}
 		}
 	}
+
+	function onSearchInputChange(event) {
+		const query = event.target.value;
+		setSearchText(event.target.value);
+		if (query.length > 0) {
+			// Search users
+			(async function () {
+				try {
+					const res = await axios.get(
+						`/api/users/search/?username=${query}`,
+						{
+							withCredentials: true,
+						}
+					);
+					setUserSearchResult(res.data);
+				} catch (err) {
+					console.log(err);
+				}
+			})();
+		} else {
+			setUserSearchResult([]);
+		}
+	}
+
 	return (
 		<React.Fragment>
-			<div className="bg-gray-200 h-screen flex justify-center">
-				<div className="flex flex-col md:flex-row justify-center h-2/3 w-5/6 sm:mt-24">
-					{/* CONVERSATIONS */}
-					<div className="md:w-3/12 h-full bg-white rounded-l shadow-2xl">
-						<nav className="w-full h-16 border-b border-gray-300 flex justify-between items-center">
-							<div className="flex justify-center items-center">
-								<img
-									src={`/images/${auth.profilePicture}`}
-									className="rounded-full ml-3 h-8 w-8 sm:w-9 sm:h-9"
-									alt={auth.username}
-								/>
-								<span className="text-md font-light text-gray-800 ml-2">
-									{auth.username}
-								</span>
-							</div>
-						</nav>
-						<div className="overflow-auto h-5/6">
-							{conversations.map((convo) => (
-								<div
-									className="flex flex-row justify-between cursor-pointer hover:bg-gray-100 hover:shadow-lg"
-									key={convo.id}
-									data-key={convo.id}
-									onClick={(e) =>
-										openConversation(convo.id, e)
-									}
-								>
-									<div className="flex flex-row p-2 justify-start">
-										<img
-											src={`/images/${convo.profilePicture}`}
-											className="rounded-full w-11 h-11 mr-2"
-											alt={`${convo.username}`}
-										/>
-										<div>
-											<div className="font-medium text-sm font">
-												{convo.username}
-											</div>
-											<div className="text-xs text-gray-500 truncate">
-												{convo.latestMessage &&
-													convo.latestMessage.text}
-											</div>
-										</div>
-									</div>
-									<div className="text-xs p-3 text-gray-300">
-										{convo.latestMessage &&
-											convo.latestMessage.time}
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
+			<div className="bg-gray-200 h-screen flex justify-center mb-80 pt-10 sm:pt-0 md:mb-0">
+				<div className="flex flex-col md:flex-row justify-center h-screen w-5/6 sm:mt-24">
+					<ConversationsList
+						auth={auth}
+						clickHandler={openConversation}
+						conversations={conversations}
+					/>
+
 					{/* CHAT */}
-					<div
-						className="flex flex-col mt-8 h-full md:mt-0 md:w-5/12  bg-white shadow-2xl relative"
-						ref={scrollBoxRef}
-					>
+					<div className="flex flex-col mt-8 h-2/3 md:mt-0 md:w-5/12  bg-white shadow-2xl relative">
 						<nav
 							className={`flex w-full h-16 ${
 								participant && "border-b"
@@ -395,45 +350,12 @@ function DirectChat() {
 						)}
 					</div>
 					{/* SEARCH USERS */}
-					<div
-						className="mt-8 md:mt-0 md:w-3/12 h-full bg-white rounded-r shadow-2xl relative"
-						ref={scrollBoxRef}
-					>
-						<nav className="w-full h-16 border-b border-gray-200 flex justify-between items-center">
-							<input
-								className="rounded-l-full w-full py-4 px-6 text-gray-700 leading-tight focus:outline-none"
-								id="search"
-								type="text"
-								placeholder="Search for users.."
-								onChange={onSearchInputChange}
-								value={searchText}
-							/>
-						</nav>
-						<div className="overflow-auto px-1 py-1 h-5/6">
-							{userSearchResult.map((user) => (
-								<div
-									className="flex flex-row bg-gray-100 justify-between cursor-pointer hover:bg-gray-200"
-									key={user.id}
-									onClick={(e) => createConversation(user, e)}
-								>
-									<div className="flex flex-row p-2 justify-start">
-										<div className="float-left">
-											<img
-												src={`/images/${user.profilePicture}`}
-												className="rounded-full w-11 h-11 mr-2"
-												alt={user.profilePicture}
-											/>
-										</div>
-										<div>
-											<div className="font-medium text-sm font">
-												{user.username}
-											</div>
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
+					<UserSearch
+						searchText={searchText}
+						clickHandler={createConversation}
+						onInputChange={onSearchInputChange}
+						searchResults={userSearchResults}
+					/>
 				</div>
 			</div>
 			<ConfirmPopup
