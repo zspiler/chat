@@ -10,6 +10,7 @@ import Spinner from "../layout/Spinner";
 import ConfirmPopup from "../layout/ConfirmPopup";
 import ConversationsList from "../ConversationsList";
 import UserSearch from "../UserSearch";
+import Error from "../layout/Error";
 
 function DirectChat() {
 	const latestMessageRef = useRef();
@@ -38,6 +39,9 @@ function DirectChat() {
 	const [deleteConvoPopup, setDeleteConvoPopup] = useState(false);
 	const [deleteConvoId, setDeleteConvoId] = useState(null);
 
+	// Error for popup
+	const [error, setError] = useState(null);
+
 	useEffect(() => {
 		fetchConversations();
 	}, []);
@@ -52,10 +56,8 @@ function DirectChat() {
 				const msg = JSON.parse(message.data);
 				setMessages((previousState) => [...previousState, msg]);
 				scrollToLatestMessage();
-			} catch (error) {
-				// TODO:
-				console.log("Error!");
-				console.log(error);
+			} catch (err) {
+				setError(err.message);
 			}
 		};
 
@@ -64,14 +66,10 @@ function DirectChat() {
 
 	async function fetchConversations() {
 		try {
-			const res = await axios.get(`/api/conversations`, {
-				withCredentials: true,
-			});
-
+			const res = await axios.get(`/api/conversations`);
 			setConversations(res.data);
 		} catch (err) {
-			// TODO: error
-			console.log(err);
+			setError(err.response?.data?.message || err.message);
 		}
 	}
 
@@ -81,10 +79,7 @@ function DirectChat() {
 			try {
 				setLoading(true);
 				const res = await axios.get(
-					`/api/conversations/${conversationId}`,
-					{
-						withCredentials: true,
-					}
+					`/api/conversations/${conversationId}`
 				);
 				setLoading(false);
 				setMessages(res.data.messages);
@@ -92,8 +87,7 @@ function DirectChat() {
 				scrollToLatestMessage();
 			} catch (err) {
 				setLoading(false);
-				// TODO: error
-				console.log(err);
+				setError(err.response?.data?.message || err.message);
 			}
 		})();
 	}
@@ -203,16 +197,13 @@ function DirectChat() {
 		setDeleteConvoPopup(false);
 		if (response) {
 			try {
-				await axios.delete(`/api/conversations/${deleteConvoId}`, {
-					withCredentials: true,
-				});
+				await axios.delete(`/api/conversations/${deleteConvoId}`);
 				fetchConversations();
 				setParticipant(null);
 				setMessages([]);
 				setDeleteConvoId(null);
 			} catch (err) {
-				// TODO: handle error
-				console.log(err);
+				setError(err.response?.data?.message || err.message);
 			}
 		}
 	}
@@ -230,18 +221,15 @@ function DirectChat() {
 		setCreateConvoPopup(false);
 		if (response) {
 			try {
-				await axios.post(
-					`/api/conversations`,
-					{ userId: createConvoUser.id },
-					{ withCredentials: true }
-				);
+				await axios.post(`/api/conversations`, {
+					userId: createConvoUser.id,
+				});
 				fetchConversations();
 				setUserSearchResult([]);
 				setSearchText("");
 				setCreateConvoUser(null);
 			} catch (err) {
-				// TODO: handle error
-				console.log(err);
+				setError(err.response?.data?.message || err.message);
 			}
 		}
 	}
@@ -254,14 +242,11 @@ function DirectChat() {
 			(async function () {
 				try {
 					const res = await axios.get(
-						`/api/users/search/?username=${query}`,
-						{
-							withCredentials: true,
-						}
+						`/api/users/search/?username=${query}`
 					);
 					setUserSearchResult(res.data);
 				} catch (err) {
-					console.log(err);
+					setError(err.response?.data?.message || err.message);
 				}
 			})();
 		} else {
@@ -282,9 +267,7 @@ function DirectChat() {
 					{/* CHAT */}
 					<div className="flex flex-col mt-8 h-2/3 md:mt-0 md:w-5/12  bg-white shadow-2xl relative">
 						<nav
-							className={`flex w-full h-16 ${
-								participant && "border-b"
-							} border-gray-200 justify-between items-center`}
+							className={`flex w-full h-16 border-gray-200 justify-between items-center`}
 						>
 							{participant && (
 								<React.Fragment>
@@ -371,6 +354,7 @@ function DirectChat() {
 				text="Delete conversation? All messages will be lost for both users!"
 				danger={true}
 			/>
+			{error && <Error error={error} />}
 		</React.Fragment>
 	);
 }

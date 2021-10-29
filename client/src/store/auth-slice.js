@@ -3,9 +3,7 @@ import axios from "axios";
 
 export const logoutUser = createAsyncThunk("user/logoutUser", async () => {
 	try {
-		const res = await axios.post("/api/auth/logout", {
-			withCredentials: true,
-		});
+		const res = await axios.post("/api/auth/logout");
 		return res.data;
 	} catch (err) {
 		if (err.response.data.message) {
@@ -21,16 +19,10 @@ export const loginUser = createAsyncThunk(
 	async (formData) => {
 		// payload creator
 		try {
-			console.log("logging in ...");
-
-			const res = await axios.post(
-				"/api/auth/login",
-				{
-					username: formData.username,
-					password: formData.password,
-				},
-				{ withCredentials: true }
-			);
+			const res = await axios.post("/api/auth/login", {
+				username: formData.username,
+				password: formData.password,
+			});
 			return res.data;
 		} catch (err) {
 			if (err.response.data.message) {
@@ -46,18 +38,11 @@ export const signupUser = createAsyncThunk(
 	"user/signupUser",
 	async (formData) => {
 		try {
-			const res = await axios.post(
-				"/api/auth/signup",
-				formData,
-				{
-					withCredentials: true,
+			const res = await axios.post("/api/auth/signup", formData, {
+				headers: {
+					"Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
 				},
-				{
-					headers: {
-						"Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
-					},
-				}
-			);
+			});
 			return res.data;
 		} catch (err) {
 			if (err.response.data.message) {
@@ -74,9 +59,7 @@ export const signupUser = createAsyncThunk(
 // Validate cookie
 export const getUser = createAsyncThunk("user/getUser", async () => {
 	try {
-		const res = await axios.post("/api/auth/token", {
-			withCredentials: true,
-		});
+		const res = await axios.post("/api/auth/token");
 		return res.data;
 	} catch (err) {
 		if (err.response.data.message) {
@@ -95,19 +78,6 @@ const authSlice = createSlice({
 		token: "",
 		username: "",
 		profilePicture: "",
-	},
-	reducers: {
-		// setLoading(state, action) {
-		// 	state.loading = action.payload;
-		// },
-		// logIn(state, action) {
-		// 	state.token = action.payload.token;
-		// 	state.username = action.payload.username;
-		// },
-		// logOut(state) {
-		// 	state.token = "";
-		// 	state.username = "";
-		// },
 	},
 	extraReducers: {
 		[loginUser.pending]: (state) => {

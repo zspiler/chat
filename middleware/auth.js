@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
-	// if (process.env.NODE_ENV !== "development") {
 	const token = req.cookies.chat_token;
+
 	if (!token) {
 		return res.status(401).json({ message: "Unauthorized" });
 	}
@@ -14,8 +14,4 @@ module.exports = function (req, res, next) {
 	} catch (err) {
 		res.status(401).json({ message: "Invalid token" });
 	}
-	// }
-	// else {
-	// next();
-	// }
 };

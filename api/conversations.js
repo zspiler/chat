@@ -80,6 +80,7 @@ router.get("/:conversationId", auth, async (req, res) => {
 	const exists = await Conversation.exists({
 		_id: mongoose.Types.ObjectId(conversationId),
 	});
+
 	if (!exists) {
 		return res.status(404).json({ message: "Conversation does not exist" });
 	}

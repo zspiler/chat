@@ -8,7 +8,6 @@ require("dotenv").config();
 // connect to database
 (async function () {
 	try {
-		// await mongoose.connect(process.env.MONGO_URL);
 		await mongoose.connect("mongodb://database:27017");
 		console.log("Connected to db");
 	} catch (err) {
