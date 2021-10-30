@@ -17,6 +17,8 @@ function DirectChat() {
 
 	const auth = useSelector((state) => state.auth);
 
+	console.log(process.env);
+
 	// websocket connection
 	const [client, setClient] = useState(null);
 
