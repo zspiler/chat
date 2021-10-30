@@ -5,9 +5,9 @@ services:
         ports:
             - "5000:5000"
         volumes:
-            - .:/usr/src/app/
+            - ./server:/usr/src/app/
     client:
-        build: ./client
+        build: client
         ports:
             - "3000:3000"
         volumes:

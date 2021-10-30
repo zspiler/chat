@@ -264,7 +264,6 @@ function DirectChat() {
 						conversations={conversations}
 					/>
 
-					{/* CHAT */}
 					<div className="flex flex-col mt-8 h-2/3 md:mt-0 md:w-5/12  bg-white shadow-2xl relative">
 						<nav
 							className={`flex w-full h-16 border-gray-200 justify-between items-center`}
@@ -332,7 +331,6 @@ function DirectChat() {
 							</div>
 						)}
 					</div>
-					{/* SEARCH USERS */}
 					<UserSearch
 						searchText={searchText}
 						clickHandler={createConversation}
