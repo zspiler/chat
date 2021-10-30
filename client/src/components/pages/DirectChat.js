@@ -48,8 +48,13 @@ function DirectChat() {
 
 	// Open WebSocket connection for a conversation
 	function initWS(conversationId) {
+		const baseUrl =
+			process.env.REACT_APP_ENV === "production"
+				? "178.128.193.133:5000" // TODO: proxy
+				: "localhost:5000";
+
 		const wsClient = new w3cwebsocket(
-			`ws://localhost:5000/api/chat/direct/${conversationId}`
+			`ws://${baseUrl}/api/chat/direct/${conversationId}`
 		);
 		wsClient.onmessage = (message) => {
 			try {
@@ -154,6 +159,7 @@ function DirectChat() {
 							</span>
 						</div>
 						<div ref={latestMessageRef} key={message._id}>
+							{scrollToLatestMessage()}
 							<MessageBubble
 								message={message}
 								fromLoggedIn={
@@ -166,6 +172,7 @@ function DirectChat() {
 			}
 			return (
 				<div ref={latestMessageRef} key={message._id}>
+					{scrollToLatestMessage()}
 					<MessageBubble
 						message={message}
 						fromLoggedIn={message.author.username === auth.username}

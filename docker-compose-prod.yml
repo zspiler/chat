@@ -1,25 +1,28 @@
 version: "3.9"
 services:
     server:
-        build: server
+        build: .
         ports:
             - "5000:5000"
         volumes:
             - ./server:/usr/src/app/
+        restart: always
     client:
         build:
             context: client
             args:
-                REACT_APP_ENV: development
+                REACT_APP_ENV: production
         ports:
-            - "80:3000"
+            - "3000:3000"
         volumes:
             - ./client/src:/usr/src/app/src
+        restart: always
     database:
         image: "mongo:4.2"
         ports:
             - "27017:27017"
         volumes:
             - mongo_data:/data/db
+        restart: always
 volumes:
     mongo_data:

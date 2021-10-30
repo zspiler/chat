@@ -55,6 +55,15 @@ function Signup() {
 		}
 	};
 
+	// Select profile pic file by dragging
+	function dropPictureHandler(ev) {
+		ev.preventDefault();
+
+		if (ev.dataTransfer.items && ev.dataTransfer.items[0].kind === "file") {
+			setProfilePicture(ev.dataTransfer.items[0].getAsFile());
+		}
+	}
+
 	function getFileExtension(filename) {
 		const basename = filename.split(/[\\/]/).pop();
 		const dotPos = basename.lastIndexOf(".");
@@ -195,7 +204,11 @@ function Signup() {
 							<label className="block text-gray-500 mb-2">
 								Profile picture
 							</label>
-							<div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+							<div
+								onDrop={dropPictureHandler}
+								onDragOver={(e) => e.preventDefault()}
+								className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+							>
 								<div className="space-y-1 text-center">
 									<svg
 										className="mx-auto h-12 w-12 text-gray-400"

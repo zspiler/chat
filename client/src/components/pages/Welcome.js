@@ -12,9 +12,6 @@ function Welcome() {
 					<h1 className="my-4 text-5xl font-bold leading-tight">
 						Chat
 					</h1>
-					<p className="leading-normal text-2xl mb-8">
-						Used by famous individuals!
-					</p>
 
 					<div>
 						<Link to="/signup">
