@@ -13,7 +13,7 @@ services:
             args:
                 REACT_APP_ENV: production
         ports:
-            - "3000:3000"
+            - "80:3000"
         volumes:
             - ./client/src:/usr/src/app/src
         restart: always
