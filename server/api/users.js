@@ -21,7 +21,7 @@ router.get("/search", auth, query("username").notEmpty(), async (req, res) => {
 	});
 
 	// Find users already in conversation with
-	let knownUsers = [];
+	let knownUsers = [user._id.toString()];
 	for (let i = 0; i < user.conversations.length; i++) {
 		const u = (await Conversation.findById(user.conversations[i])).users;
 		u.forEach((u) => {

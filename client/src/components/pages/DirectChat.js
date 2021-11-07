@@ -12,12 +12,12 @@ import ConversationsList from "../ConversationsList";
 import UserSearch from "../UserSearch";
 import Error from "../layout/Error";
 
+import { animateScroll } from "react-scroll";
+
 function DirectChat() {
 	const latestMessageRef = useRef();
 
 	const auth = useSelector((state) => state.auth);
-
-	console.log(process.env);
 
 	// websocket connection
 	const [client, setClient] = useState(null);
@@ -52,7 +52,7 @@ function DirectChat() {
 	function initWS(conversationId) {
 		const baseUrl =
 			process.env.REACT_APP_ENV === "production"
-				? "178.128.193.133:5000" // TODO: proxy
+				? "178.128.193.133:5000" // TODO: proxy!!!, aaaaa localhost:80!!!
 				: "localhost:5000";
 
 		const wsClient = new w3cwebsocket(
@@ -64,6 +64,7 @@ function DirectChat() {
 				setMessages((previousState) => [...previousState, msg]);
 				scrollToLatestMessage();
 			} catch (err) {
+				console.log("err");
 				setError(err.message);
 			}
 		};
@@ -90,7 +91,6 @@ function DirectChat() {
 				);
 				setLoading(false);
 				setMessages(res.data.messages);
-
 				scrollToLatestMessage();
 			} catch (err) {
 				setLoading(false);
@@ -125,15 +125,10 @@ function DirectChat() {
 	}
 
 	function scrollToLatestMessage() {
-		if (messages.length > 0) {
-			if (latestMessageRef.current) {
-				latestMessageRef.current.scrollIntoView({
-					behavior: "smooth",
-					block: "nearest",
-					inline: "start",
-				});
-			}
-		}
+		animateScroll.scrollToBottom({
+			containerId: "chatWindow",
+			duration: 600,
+		});
 	}
 
 	function renderMessages() {
@@ -161,7 +156,6 @@ function DirectChat() {
 							</span>
 						</div>
 						<div ref={latestMessageRef} key={message._id}>
-							{scrollToLatestMessage()}
 							<MessageBubble
 								message={message}
 								fromLoggedIn={
@@ -174,7 +168,6 @@ function DirectChat() {
 			}
 			return (
 				<div ref={latestMessageRef} key={message._id}>
-					{scrollToLatestMessage()}
 					<MessageBubble
 						message={message}
 						fromLoggedIn={message.author.username === auth.username}
@@ -300,7 +293,10 @@ function DirectChat() {
 								</React.Fragment>
 							)}
 						</nav>
-						<div className="overflow-y-auto px-1 py-1 h-5/6">
+						<div
+							className="overflow-y-auto px-1 py-1 h-5/6"
+							id="chatWindow"
+						>
 							{!participant && (
 								<div className=" w-full h-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center">
 									<div className="ease-linear rounded-full text-sm text-gray-500 border-gray-200 mb-4">
